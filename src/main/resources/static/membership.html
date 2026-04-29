@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pet Mate - 등급 관리</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <script
+            type="text/javascript"
+            src="https://cdn.iamport.kr/js/iamport.payment-1.2.0.js"></script>
+    <style>
+        .membership-container {
+            max-width: 960px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        /* 현재 등급 배너 */
+        .current-grade {
+            text-align: center;
+            padding: 32px 20px;
+            background: #fffdf9;
+            border-radius: 16px;
+            border: 1px solid #f0e8dd;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+            margin-bottom: 36px;
+        }
+        .current-grade .grade-icon { font-size: 48px; margin-bottom: 8px; }
+        .current-grade .grade-name {
+            font-size: 22px;
+            font-weight: 800;
+            color: #B8956A;
+            margin-bottom: 4px;
+        }
+        .current-grade .grade-desc { font-size: 14px; color: #888; }
+
+        /* 등급 카드 그리드 */
+        .grade-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+        .grade-card {
+            background: #fffdf9;
+            border-radius: 20px;
+            padding: 36px 24px 28px;
+            text-align: center;
+            border: 2px solid #f0e8dd;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            transition: transform 0.2s, box-shadow 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+        .grade-card:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
+
+        /* 현재 등급 하이라이트 */
+        .grade-card.current {
+            border-color: #B8956A;
+            background: linear-gradient(180deg, #fdf6ee 0%, #fffdf9 100%);
+        }
+        .grade-card.current::before {
+            content: '현재 등급';
+            position: absolute;
+            top: 14px;
+            right: -28px;
+            background: #B8956A;
+            color: #fff;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 4px 36px;
+            transform: rotate(45deg);
+        }
+
+        .grade-card .icon { font-size: 44px; margin-bottom: 12px; }
+        .grade-card .name {
+            font-size: 20px;
+            font-weight: 800;
+            margin-bottom: 6px;
+        }
+        .grade-card .price {
+            font-size: 26px;
+            font-weight: 800;
+            margin-bottom: 4px;
+        }
+        .grade-card .price-sub { font-size: 13px; color: #999; margin-bottom: 20px; }
+
+        .grade-card .benefit-list {
+            list-style: none;
+            text-align: left;
+            margin-bottom: 24px;
+        }
+        .grade-card .benefit-list li {
+            font-size: 13px;
+            color: #666;
+            padding: 6px 0;
+            border-bottom: 1px solid #f5efe6;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .grade-card .benefit-list li .check { color: #B8956A; font-weight: 700; }
+
+        .btn-grade {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: 'Pretendard', 'Apple SD Gothic Neo', sans-serif;
+        }
+        .btn-grade.primary { background: #B8956A; color: #fff; }
+        .btn-grade.primary:hover { background: #A6845C; }
+        .btn-grade.disabled { background: #e8ddd0; color: #aaa; cursor: default; }
+
+        /* 브론즈 */
+        .grade-card[data-grade="BRONZE"] .name { color: #8a8a8a; }
+        .grade-card[data-grade="BRONZE"] .price { color: #8a8a8a; }
+        /* 실버 */
+        .grade-card[data-grade="SILVER"] .name { color: #C0C0C0; }
+        .grade-card[data-grade="SILVER"] .price { color: #C0C0C0; }
+        /* 골드 */
+        .grade-card[data-grade="GOLD"] .name { color: #D4A843; }
+        .grade-card[data-grade="GOLD"] .price { color: #D4A843; }
+
+        /* 결제 모달 */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 200;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-overlay.show { display: flex; }
+        .modal-box {
+            background: #fff;
+            border-radius: 20px;
+            padding: 36px 32px;
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+            position: relative;
+        }
+        .modal-box h3 {
+            font-size: 20px;
+            color: #5a4a3a;
+            margin-bottom: 6px;
+        }
+        .modal-box .modal-desc {
+            font-size: 14px;
+            color: #888;
+            margin-bottom: 24px;
+        }
+        .modal-box .modal-price {
+            font-size: 28px;
+            font-weight: 800;
+            color: #B8956A;
+            margin-bottom: 24px;
+        }
+        .pay-method-group { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+        .pay-method-option {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 14px 16px;
+            border: 2px solid #eee;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 14px;
+            font-weight: 600;
+            color: #555;
+        }
+        .pay-method-option:hover { border-color: #ccc; }
+        .pay-method-option.selected { border-color: #B8956A; background: #fdf6ee; }
+        .pay-method-option input[type="radio"] { accent-color: #B8956A; width: 16px; height: 16px; }
+        .btn-pay-confirm {
+            width: 100%;
+            padding: 14px;
+            background: #B8956A;
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-family: 'Pretendard', 'Apple SD Gothic Neo', sans-serif;
+        }
+        .btn-pay-confirm:hover { background: #A6845C; }
+
+        .modal-close {
+            position: absolute;
+            top: 14px; right: 18px;
+            background: none;
+            border: none;
+            font-size: 22px;
+            color: #999;
+            cursor: pointer;
+        }
+        .modal-close:hover { color: #333; }
+
+        @media (max-width: 768px) {
+            .grade-grid { grid-template-columns: 1fr; max-width: 360px; margin-left: auto; margin-right: auto; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Header -->
+<header class="header">
+    <div class="header-inner">
+        <a href="/main.html" class="logo">
+            <span>🐾</span> Pet Mate
+        </a>
+        <nav class="nav">
+            <a href="/community.html">커뮤니티</a>
+            <a href="/matching.html">매칭 잡기</a>
+            <a href="/chat.html">채팅</a>
+            <a href="/mypage.html">마이페이지</a>
+            <a href="#" onclick="logout()" style="color:#e53935;">로그아웃</a>
+        </nav>
+    </div>
+</header>
+
+<!-- 현재 등급 -->
+<div class="membership-container">
+    <div class="current-grade">
+        <div class="grade-icon" id="currentIcon">🐱</div>
+        <div class="grade-name" id="currentName">실버 집사</div>
+        <div class="grade-desc" id="currentDesc">기본 등급입니다. 업그레이드하고 더 많은 혜택을 누려보세요!</div>
+    </div>
+
+    <!-- 등급 카드 -->
+    <div class="grade-grid">
+        <!-- 브론즈 집사 -->
+        <div class="grade-card current" data-grade="BRONZE">
+            <div class="icon">🐱</div>
+            <div class="name">브론즈 집사</div>
+            <div class="price">무료</div>
+            <div class="price-sub">기본 등급</div>
+            <ul class="benefit-list">
+                <li><span class="check">✓</span> 커뮤니티 이용</li>
+                <li><span class="check">✓</span> 기본 매칭 기능</li>
+                <li><span class="check">✓</span> 1:1 채팅</li>
+            </ul>
+            <button class="btn-grade disabled">현재 등급</button>
+        </div>
+
+        <!-- 실버 집사 -->
+        <div class="grade-card" data-grade="SILVER">
+            <div class="icon">🐶</div>
+            <div class="name">실버 집사</div>
+            <div class="price">900원</div>
+            <div class="price-sub">월 정기 구독</div>
+            <ul class="benefit-list">
+                <li><span class="check">✓</span> 브론즈 집사 혜택 전체</li>
+                <li><span class="check">✓</span> 인기유저 우선 매칭 추천</li>
+                <li><span class="check">✓</span> 프로필 실버 배지</li>
+                <li><span class="check">✓</span> 기분 좋음</li>
+            </ul>
+            <button class="btn-grade primary" onclick="openPayModal('SILVER', '실버 집사', '900원')">업그레이드</button>
+        </div>
+
+        <!-- 골드 집사 -->
+        <div class="grade-card" data-grade="GOLD">
+            <div class="icon">👑</div>
+            <div class="name">골드 집사</div>
+            <div class="price">2,900원</div>
+            <div class="price-sub">월 정기 구독</div>
+            <ul class="benefit-list">
+                <li><span class="check">✓</span> 실버 집사 혜택 전체</li>
+                <li><span class="check">✓</span> 무제한 매칭</li>
+                <li><span class="check">✓</span> 프로필 골드 배지</li>
+                <li><span class="check">✓</span> 산책 모임 생성권한 부여</li>
+            </ul>
+            <button class="btn-grade primary" onclick="openPayModal('GOLD', '골드 집사', '2,900원')">업그레이드</button>
+        </div>
+    </div>
+</div>
+
+<!-- 결제 모달 -->
+<div class="modal-overlay" id="payModal">
+    <div class="modal-box">
+        <button class="modal-close" onclick="closePayModal()">&times;</button>
+        <h3 id="modalTitle">골드 집사</h3>
+        <div class="modal-desc">구독 결제</div>
+        <div class="modal-price" id="modalPrice">4,900원<span style="font-size:14px;font-weight:400;color:#999;">/월</span></div>
+        <div style="text-align:left; margin-bottom:20px;">
+            <label style="display:block; font-size:13px; font-weight:600; color:#6b5b4a; margin-bottom:6px;">이름</label>
+            <input type="text" id="buyerName" placeholder="이름을 입력하세요" style="width:100%; padding:10px 12px; border:1px solid #e0d5c8; border-radius:8px; font-size:14px; margin-bottom:12px; outline:none;">
+            <label style="display:block; font-size:13px; font-weight:600; color:#6b5b4a; margin-bottom:6px;">연락처</label>
+            <input type="tel" id="buyerTel" placeholder="010-0000-0000" style="width:100%; padding:10px 12px; border:1px solid #e0d5c8; border-radius:8px; font-size:14px; margin-bottom:12px; outline:none;">
+            <label style="display:block; font-size:13px; font-weight:600; color:#6b5b4a; margin-bottom:6px;">이메일</label>
+            <input type="email" id="buyerEmail" placeholder="example@email.com" style="width:100%; padding:10px 12px; border:1px solid #e0d5c8; border-radius:8px; font-size:14px; outline:none;">
+        </div>
+        <button class="btn-pay-confirm" onclick="requestPay()">결제하기</button>
+    </div>
+</div>
+
+<footer class="footer">
+    <p>&copy; 2026 Pet Mate. All rights reserved.</p>
+</footer>
+
+<script src="/js/common.js"></script>
+<script>
+    if (!isLoggedIn()) location.href = '/index.html';
+
+    const userKey = getUserKey();
+    let selectedGrade = '';
+
+    // 등급 정보
+    const gradeInfo = {
+        BRONZE: { name: '브론즈 집사', icon: '🐱', desc: '기본 등급입니다. 업그레이드하고 더 많은 혜택을 누려보세요!' },
+        SILVER: { name: '실버 집사', icon: '🐶', desc: '실버 배지와 우선 매칭을 포함한 프리미엄 혜택을 이용 중입니다.' },
+        GOLD:   { name: '골드 집사', icon: '👑', desc: '최고 등급! 무제한 매칭과 전용 이벤트 등 모든 혜택을 누리고 있습니다.' }
+    };
+
+    // 현재 등급 로드 (API 연동 시 교체)
+    async function loadMembership() {
+        try {
+            const user = await apiCall('/api/user/' + userKey);
+            const grade = user.grade || 'BRONZE';
+            updateGradeUI(grade);
+        } catch (e) {
+            updateGradeUI('BRONZE');
+        }
+    }
+
+    function updateGradeUI(grade) {
+        const info = gradeInfo[grade];
+        document.getElementById('currentIcon').textContent = info.icon;
+        document.getElementById('currentName').textContent = info.name;
+        document.getElementById('currentDesc').textContent = info.desc;
+
+        // 카드 하이라이트 갱신
+        document.querySelectorAll('.grade-card').forEach(card => {
+            const cardGrade = card.dataset.grade;
+            const btn = card.querySelector('.btn-grade');
+            card.classList.remove('current');
+
+            if (cardGrade === grade) {
+                card.classList.add('current');
+                btn.className = 'btn-grade disabled';
+                btn.textContent = '현재 등급';
+                btn.onclick = null;
+            } else {
+                // 현재 등급보다 낮은 등급은 비활성
+                const order = ['BRONZE', 'SILVER', 'GOLD'];
+                if (order.indexOf(cardGrade) <= order.indexOf(grade)) {
+                    btn.className = 'btn-grade disabled';
+                    btn.textContent = '이용 중';
+                    btn.onclick = null;
+                } else {
+                    btn.className = 'btn-grade primary';
+                    btn.textContent = '업그레이드';
+                }
+            }
+        });
+    }
+
+    // 결제 모달
+    function openPayModal(grade, name, price) {
+        selectedGrade = grade;
+        document.getElementById('modalTitle').textContent = name;
+        document.getElementById('modalPrice').innerHTML = price + '<span style="font-size:14px;font-weight:400;color:#999;">/월</span>';
+        document.getElementById('payModal').classList.add('show');
+    }
+
+    function closePayModal() {
+        document.getElementById('payModal').classList.remove('show');
+        selectedGrade = '';
+    }
+
+    // 모달 바깥 클릭 시 닫기
+    document.getElementById('payModal').addEventListener('click', function(e) {
+        if (e.target === this) closePayModal();
+    });
+
+    // 결제 수단 선택
+    function selectMethod(el) {
+        document.querySelectorAll('.pay-method-option').forEach(o => o.classList.remove('selected'));
+        el.classList.add('selected');
+    }
+
+    // 등급별 가격
+    const gradePrice = { SILVER: 900, GOLD: 1000 };
+
+    // 포트원(KG이니시스) 결제 요청
+    function requestPay() {
+        if (!window.IMP) {
+            alert('결제 모듈을 불러오는 중입니다. 잠시 후 다시 시도해주세요.');
+            return;
+        }
+
+        var buyerName = document.getElementById('buyerName').value.trim();
+        var buyerTel = document.getElementById('buyerTel').value.trim();
+        var buyerEmail = document.getElementById('buyerEmail').value.trim();
+
+        if (!buyerName) { alert('이름을 입력해주세요.'); return; }
+        if (!buyerTel) { alert('연락처를 입력해주세요.'); return; }
+
+        var gradeName = document.getElementById('modalTitle').textContent;
+        var amount = gradePrice[selectedGrade];
+
+        window.IMP.request_pay({
+            pg: 'html5_inicis',
+            pay_method: 'card',
+            merchant_uid: 'petmate_' + Date.now(),
+            name: 'Pet Mate ' + gradeName + ' 구독',
+            amount: amount,
+            buyer_name: buyerName,
+            buyer_tel: buyerTel,
+            buyer_email: buyerEmail,
+        }, function(rsp) {
+            if (rsp.success) {
+                fetch('/api/payment/verify', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        impUid: rsp.imp_uid,
+                        merchantUid: rsp.merchant_uid,
+                        userKey: userKey,
+                        grade: selectedGrade,
+                        amount: amount,
+                        buyerName: buyerName,
+                        buyerEmail: buyerEmail,
+                        buyerTel: buyerTel,
+                        payMethod: 'card'
+                    })
+                })
+                .then(function(res) { return res.json(); })
+                .then(function(data) {
+                    if (data.success) {
+                        alert('결제가 완료되었습니다!');
+                        closePayModal();
+                        loadMembership();
+                    } else {
+                        alert('결제 검증 실패: ' + (data.message || '서버 오류'));
+                    }
+                })
+                .catch(function() {
+                    alert('결제 검증 요청 실패. 관리자에게 문의해주세요.');
+                });
+            } else {
+                alert('결제 실패: ' + rsp.error_msg);
+            }
+        });
+    }
+
+    loadMembership();
+</script>
+<script>
+    // 포트원 SDK 동적 로드 + 초기화
+    (function() {
+        var script = document.createElement('script');
+        script.src = 'https://cdn.iamport.kr/v1/iamport.js';
+        script.onload = function() {
+            window.IMP.init('imp67844376');
+        };
+        document.body.appendChild(script);
+    })();
+</script>
+</body>
+</html>

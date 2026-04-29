@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pet Mate - 게시글</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .detail-container {
+            max-width: 720px;
+            margin: 0 auto;
+            padding: 24px 20px 60px;
+        }
+        .btn-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: #B8956A;
+            font-weight: 600;
+            font-size: 14px;
+            text-decoration: none;
+            margin-bottom: 20px;
+        }
+        .btn-back:hover { text-decoration: underline; }
+
+        /* Image gallery */
+        .image-gallery {
+            position: relative;
+            border-radius: 16px;
+            overflow: hidden;
+            margin-bottom: 24px;
+            background: #f0e8dd;
+        }
+        .image-gallery img {
+            width: 100%;
+            height: 420px;
+            object-fit: cover;
+            display: none;
+        }
+        .image-gallery img.active { display: block; }
+        .gallery-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0,0,0,0.4);
+            color: #fff;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-size: 20px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .gallery-arrow:hover { background: rgba(0,0,0,0.6); }
+        .gallery-arrow.left { left: 12px; }
+        .gallery-arrow.right { right: 12px; }
+        .gallery-dots {
+            text-align: center;
+            padding: 12px 0;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+        }
+        .gallery-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.5);
+            margin: 0 4px;
+            transition: background 0.2s;
+        }
+        .gallery-dot.active { background: #fff; }
+
+        /* Post content */
+        .post-tag {
+            display: inline-block;
+            padding: 4px 14px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+        .post-tag[data-tag="우리 애 자랑"] { background: #FFF8F0; color: #D4883A; }
+        .post-tag[data-tag="산책 후기"] { background: #F2FAF3; color: #5A9660; }
+        .post-tag[data-tag="질문게시판"] { background: #F0F7FE; color: #5090C1; }
+        .post-tag[data-tag="번개산책모집"] { background: #F8F0FA; color: #9C6DB5; }
+        .post-tag[data-tag="매칭 후기"] { background: #FEF0F4; color: #D8708A; }
+        .post-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #5a4a3a;
+            margin-bottom: 14px;
+            line-height: 1.4;
+        }
+        .post-author-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 24px;
+            font-size: 14px;
+            color: #888;
+        }
+        .post-author-row img {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            object-fit: cover;
+            background: #e0d5c8;
+        }
+        .post-author-row .author-name { font-weight: 600; color: #5a4a3a; }
+        .post-content {
+            font-size: 15px;
+            line-height: 1.8;
+            color: #444;
+            margin-bottom: 28px;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        /* Like area */
+        .like-area {
+            text-align: center;
+            padding: 20px 0;
+            border-top: 1px solid #f0e8dd;
+            border-bottom: 1px solid #f0e8dd;
+            margin-bottom: 32px;
+        }
+        .btn-like {
+            padding: 10px 32px;
+            border: 2px solid #B8956A;
+            border-radius: 20px;
+            background: #fff;
+            color: #B8956A;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: 'Pretendard', 'Apple SD Gothic Neo', sans-serif;
+        }
+        .btn-like:hover { background: #faf3eb; }
+        .btn-like.liked {
+            background: #B8956A;
+            color: #fff;
+        }
+
+        /* Delete button */
+        .btn-delete-post {
+            padding: 6px 14px;
+            border: 1px solid #e53935;
+            background: #fff;
+            color: #e53935;
+            border-radius: 10px;
+            font-size: 13px;
+            cursor: pointer;
+            margin-left: auto;
+            font-family: 'Pretendard', 'Apple SD Gothic Neo', sans-serif;
+        }
+        .btn-delete-post:hover { background: #fce4ec; }
+
+        /* Comments section */
+        .comments-section { margin-top: 8px; }
+        .comments-section h3 {
+            font-size: 18px;
+            font-weight: 700;
+            color: #5a4a3a;
+            margin-bottom: 16px;
+        }
+        .comment-form {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 24px;
+        }
+        .comment-form input {
+            flex: 1;
+            padding: 12px 14px;
+            border: 1px solid #e0d5c8;
+            border-radius: 10px;
+            font-size: 14px;
+            background: #fdfbf7;
+            font-family: 'Pretendard', 'Apple SD Gothic Neo', sans-serif;
+        }
+        .comment-form input:focus { outline: none; border-color: #B8956A; background: #fff; }
+        .comment-form button {
+            padding: 12px 20px;
+            background: #B8956A;
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: 'Pretendard', 'Apple SD Gothic Neo', sans-serif;
+            white-space: nowrap;
+        }
+        .comment-form button:hover { background: #A6845C; }
+
+        .comment-item {
+            padding: 14px 0;
+            border-bottom: 1px solid #f5f0ea;
+        }
+        .comment-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 6px;
+        }
+        .comment-header img {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            object-fit: cover;
+            background: #e0d5c8;
+        }
+        .comment-header .name { font-weight: 600; font-size: 14px; color: #5a4a3a; }
+        .comment-header .time { font-size: 12px; color: #bbb; }
+        .comment-body { font-size: 14px; color: #555; margin-bottom: 6px; line-height: 1.6; }
+        .comment-actions { font-size: 13px; }
+        .comment-actions button {
+            background: none;
+            border: none;
+            color: #B8956A;
+            cursor: pointer;
+            font-weight: 600;
+            font-family: 'Pretendard', 'Apple SD Gothic Neo', sans-serif;
+            padding: 2px 6px;
+        }
+        .comment-actions button:hover { text-decoration: underline; }
+        .comment-actions .btn-comment-delete { color: #e53935; }
+
+        /* Replies */
+        .reply-list { padding-left: 36px; }
+        .reply-form {
+            display: none;
+            margin-top: 8px;
+            padding-left: 36px;
+            gap: 8px;
+        }
+        .reply-form.show { display: flex; }
+        .reply-form input {
+            flex: 1;
+            padding: 10px 12px;
+            border: 1px solid #e0d5c8;
+            border-radius: 10px;
+            font-size: 13px;
+            background: #fdfbf7;
+            font-family: 'Pretendard', 'Apple SD Gothic Neo', sans-serif;
+        }
+        .reply-form input:focus { outline: none; border-color: #B8956A; background: #fff; }
+        .reply-form button {
+            padding: 10px 14px;
+            background: #D4BC9A;
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: 'Pretendard', 'Apple SD Gothic Neo', sans-serif;
+            white-space: nowrap;
+        }
+        .reply-form button:hover { background: #C4A882; }
+
+        @media (max-width: 768px) {
+            .image-gallery img { height: 280px; }
+            .post-title { font-size: 20px; }
+            .reply-list { padding-left: 20px; }
+            .reply-form { padding-left: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Header -->
+<header class="header">
+    <div class="header-inner">
+        <a href="/main.html" class="logo">
+            <span>🐾</span> Pet Mate
+        </a>
+        <nav class="nav">
+            <a href="/community.html" style="color:#B8956A;">커뮤니티</a>
+            <a href="/matching.html">매칭 잡기</a>
+            <a href="/chat.html">채팅</a>
+            <a href="/mypage.html">마이페이지</a>
+            <a href="#" onclick="logout()" style="color:#e53935;">로그아웃</a>
+        </nav>
+    </div>
+</header>
+
+<div class="detail-container">
+    <a href="/community.html" class="btn-back">← 목록으로</a>
+
+    <!-- Image gallery -->
+    <div class="image-gallery" id="imageGallery" style="display:none;"></div>
+
+    <!-- Post content area -->
+    <div id="postContent"></div>
+
+    <!-- Comments section -->
+    <div class="comments-section">
+        <h3>댓글 <span id="commentCountLabel">0</span></h3>
+        <div class="comment-form">
+            <input type="text" id="commentInput" placeholder="댓글을 입력하세요..." maxlength="1000">
+            <button onclick="submitComment()">등록</button>
+        </div>
+        <div id="commentList"></div>
+    </div>
+</div>
+
+<!-- Footer -->
+<footer class="footer">
+    <p>&copy; 2026 Pet Mate. All rights reserved.</p>
+</footer>
+
+<script src="/js/common.js"></script>
+<script>
+    if (!isLoggedIn()) location.href = '/index.html';
+
+    const userKey = getUserKey();
+    const postId = new URLSearchParams(location.search).get('id');
+    let postData = null;
+    let currentImageIndex = 0;
+
+    if (!postId) location.href = '/community.html';
+
+    async function loadPost() {
+        try {
+            postData = await apiCall('/api/community/posts/' + postId + '?userKey=' + userKey);
+            if (postData.success === false) {
+                alert(postData.message || '게시글을 불러올 수 없습니다.');
+                location.href = '/community.html';
+                return;
+            }
+            renderGallery();
+            renderPost();
+            loadComments();
+        } catch (e) {
+            console.error(e);
+            alert('게시글을 불러올 수 없습니다.');
+            location.href = '/community.html';
+        }
+    }
+
+    function renderGallery() {
+        const gallery = document.getElementById('imageGallery');
+        if (!postData.imageUrls || postData.imageUrls.length === 0) {
+            gallery.style.display = 'none';
+            return;
+        }
+        gallery.style.display = 'block';
+        const imgs = postData.imageUrls;
+        gallery.innerHTML =
+            imgs.map((url, i) =>
+                '<img src="' + url + '" class="' + (i === 0 ? 'active' : '') + '" data-index="' + i + '">'
+            ).join('') +
+            (imgs.length > 1 ?
+                '<button class="gallery-arrow left" onclick="changeImage(-1)">&#8249;</button>' +
+                '<button class="gallery-arrow right" onclick="changeImage(1)">&#8250;</button>' +
+                '<div class="gallery-dots">' +
+                    imgs.map((_, i) => '<span class="gallery-dot ' + (i === 0 ? 'active' : '') + '"></span>').join('') +
+                '</div>' : '');
+    }
+
+    function changeImage(dir) {
+        const imgs = document.querySelectorAll('.image-gallery img');
+        const dots = document.querySelectorAll('.gallery-dot');
+        if (imgs.length === 0) return;
+        imgs[currentImageIndex].classList.remove('active');
+        if (dots[currentImageIndex]) dots[currentImageIndex].classList.remove('active');
+        currentImageIndex = (currentImageIndex + dir + imgs.length) % imgs.length;
+        imgs[currentImageIndex].classList.add('active');
+        if (dots[currentImageIndex]) dots[currentImageIndex].classList.add('active');
+    }
+
+    function renderPost() {
+        const p = postData;
+        document.getElementById('postContent').innerHTML =
+            '<span class="post-tag" data-tag="' + p.tag + '">' + getTagEmoji(p.tag) + ' ' + escapeHtml(p.tag) + '</span>' +
+            '<h1 class="post-title">' + escapeHtml(p.title) + '</h1>' +
+            '<div class="post-author-row">' +
+                '<img src="' + (p.userProfileImage || '/uploads/default_profile.png') + '">' +
+                '<span class="author-name">' + escapeHtml(p.userName) + '</span>' +
+                '<span>' + formatDate(p.createdAt) + '</span>' +
+                (String(p.userId) === String(userKey) ?
+                    '<button class="btn-delete-post" onclick="deletePost()">삭제</button>' : '') +
+            '</div>' +
+            '<div class="post-content">' + escapeHtml(p.content) + '</div>' +
+            '<div class="like-area">' +
+                '<button class="btn-like ' + (p.liked ? 'liked' : '') + '" onclick="toggleLike()" id="likeBtn">' +
+                    '♥ 좋아요 <span id="likeCount">' + p.likeCount + '</span>' +
+                '</button>' +
+            '</div>';
+    }
+
+    async function toggleLike() {
+        try {
+            const result = await apiCall('/api/community/posts/' + postId + '/like?userKey=' + userKey, { method: 'POST' });
+            if (result.success) {
+                document.getElementById('likeCount').textContent = result.likeCount;
+                const btn = document.getElementById('likeBtn');
+                if (result.liked) {
+                    btn.classList.add('liked');
+                } else {
+                    btn.classList.remove('liked');
+                }
+            }
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
+    async function deletePost() {
+        if (!confirm('정말 삭제하시겠습니까?')) return;
+        try {
+            const result = await apiCall('/api/community/posts/' + postId + '?userKey=' + userKey, { method: 'DELETE' });
+            if (result.success) location.href = '/community.html';
+            else alert(result.message || '삭제 실패');
+        } catch (e) {
+            alert('오류가 발생했습니다.');
+        }
+    }
+
+    async function loadComments() {
+        try {
+            const comments = await apiCall('/api/community/posts/' + postId + '/comments');
+            renderComments(comments);
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
+    function renderComments(comments) {
+        const list = document.getElementById('commentList');
+        let total = 0;
+        comments.forEach(function(c) { total++; total += (c.replies ? c.replies.length : 0); });
+        document.getElementById('commentCountLabel').textContent = total;
+
+        if (!comments || comments.length === 0) {
+            list.innerHTML = '<p style="text-align:center;color:#bbb;padding:20px 0;">아직 댓글이 없습니다.</p>';
+            return;
+        }
+
+        list.innerHTML = comments.map(function(c) {
+            return '<div class="comment-item">' +
+                '<div class="comment-header">' +
+                    '<img src="' + (c.userProfileImage || '/uploads/default_profile.png') + '">' +
+                    '<span class="name">' + escapeHtml(c.userName) + '</span>' +
+                    '<span class="time">' + formatDate(c.createdAt) + '</span>' +
+                '</div>' +
+                '<div class="comment-body">' + escapeHtml(c.content) + '</div>' +
+                '<div class="comment-actions">' +
+                    '<button onclick="toggleReplyForm(' + c.id + ')">답글</button>' +
+                    (String(c.userId) === String(userKey) ?
+                        '<button class="btn-comment-delete" onclick="deleteComment(' + c.id + ')">삭제</button>' : '') +
+                '</div>' +
+                '<div class="reply-form" id="replyForm-' + c.id + '">' +
+                    '<input type="text" id="replyInput-' + c.id + '" placeholder="답글을 입력하세요..." maxlength="1000">' +
+                    '<button onclick="submitReply(' + c.id + ')">등록</button>' +
+                '</div>' +
+                '<div class="reply-list">' +
+                    (c.replies || []).map(function(r) {
+                        return '<div class="comment-item">' +
+                            '<div class="comment-header">' +
+                                '<img src="' + (r.userProfileImage || '/uploads/default_profile.png') + '">' +
+                                '<span class="name">' + escapeHtml(r.userName) + '</span>' +
+                                '<span class="time">' + formatDate(r.createdAt) + '</span>' +
+                            '</div>' +
+                            '<div class="comment-body">' + escapeHtml(r.content) + '</div>' +
+                            (String(r.userId) === String(userKey) ?
+                                '<div class="comment-actions"><button class="btn-comment-delete" onclick="deleteComment(' + r.id + ')">삭제</button></div>' : '') +
+                        '</div>';
+                    }).join('') +
+                '</div>' +
+            '</div>';
+        }).join('');
+    }
+
+    function toggleReplyForm(commentId) {
+        var form = document.getElementById('replyForm-' + commentId);
+        form.classList.toggle('show');
+        if (form.classList.contains('show')) {
+            form.querySelector('input').focus();
+        }
+    }
+
+    async function submitComment() {
+        var input = document.getElementById('commentInput');
+        var val = input.value.trim();
+        if (!val) return;
+        try {
+            await apiCall('/api/community/posts/' + postId + '/comments', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userKey: parseInt(userKey), content: val })
+            });
+            input.value = '';
+            loadComments();
+        } catch (e) {
+            alert('댓글 등록에 실패했습니다.');
+        }
+    }
+
+    async function submitReply(parentId) {
+        var input = document.getElementById('replyInput-' + parentId);
+        var val = input.value.trim();
+        if (!val) return;
+        try {
+            await apiCall('/api/community/posts/' + postId + '/comments', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userKey: parseInt(userKey), content: val, parentId: parentId })
+            });
+            input.value = '';
+            loadComments();
+        } catch (e) {
+            alert('답글 등록에 실패했습니다.');
+        }
+    }
+
+    async function deleteComment(commentId) {
+        if (!confirm('댓글을 삭제하시겠습니까?')) return;
+        try {
+            await apiCall('/api/community/comments/' + commentId + '?userKey=' + userKey, { method: 'DELETE' });
+            loadComments();
+        } catch (e) {
+            alert('삭제에 실패했습니다.');
+        }
+    }
+
+    function formatDate(dateStr) {
+        if (!dateStr) return '';
+        var d = new Date(dateStr);
+        var month = d.getMonth() + 1;
+        var day = d.getDate();
+        var hour = String(d.getHours()).padStart(2, '0');
+        var min = String(d.getMinutes()).padStart(2, '0');
+        return month + '/' + day + ' ' + hour + ':' + min;
+    }
+
+    function getTagEmoji(tag) {
+        var map = { '우리 애 자랑': '🏆', '산책 후기': '🌿', '질문게시판': '❓', '번개산책모집': '⚡', '매칭 후기': '💕' };
+        return map[tag] || '🐾';
+    }
+
+    function escapeHtml(text) {
+        if (!text) return '';
+        var div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    // Enter key for comment input
+    document.getElementById('commentInput').addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') submitComment();
+    });
+
+    loadPost();
+</script>
+</body>
+</html>

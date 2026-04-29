@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pet Mate - 글쓰기</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .write-container {
+            max-width: 640px;
+            margin: 40px auto;
+            padding: 0 20px 60px;
+        }
+        .write-box {
+            background: #fffdf9;
+            border-radius: 16px;
+            padding: 32px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+            border: 1px solid #f0e8dd;
+        }
+        .write-box h2 {
+            text-align: center;
+            margin-bottom: 28px;
+            color: #B8956A;
+            font-size: 22px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group > label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: #6b5b4a;
+        }
+
+        /* Tag selector */
+        .tag-selector {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .tag-selector input[type="radio"] { display: none; }
+        .tag-selector label {
+            padding: 8px 16px;
+            border: 1.5px solid #D4BC9A;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #7a6a56;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .tag-selector label:hover { opacity: 0.85; transform: translateY(-1px); }
+
+        /* 우리 애 자랑 - 연한 오렌지 */
+        .tag-selector label[for="tag1"] { background: #FFF8F0; color: #D4883A; border-color: #FFE8CC; }
+        .tag-selector input#tag1:checked + label { background: #F0A050; color: #fff; border-color: #F0A050; }
+
+        /* 산책 후기 - 연한 그린 */
+        .tag-selector label[for="tag2"] { background: #F2FAF3; color: #5A9660; border-color: #D4EDDA; }
+        .tag-selector input#tag2:checked + label { background: #7BC47F; color: #fff; border-color: #7BC47F; }
+
+        /* 질문게시판 - 연한 블루 */
+        .tag-selector label[for="tag3"] { background: #F0F7FE; color: #5090C1; border-color: #D0E6FA; }
+        .tag-selector input#tag3:checked + label { background: #74B9F0; color: #fff; border-color: #74B9F0; }
+
+        /* 번개산책모집 - 연한 퍼플 */
+        .tag-selector label[for="tag4"] { background: #F8F0FA; color: #9C6DB5; border-color: #E8D4F0; }
+        .tag-selector input#tag4:checked + label { background: #C08AD8; color: #fff; border-color: #C08AD8; }
+
+        /* 매칭 후기 - 연한 핑크 */
+        .tag-selector label[for="tag5"] { background: #FEF0F4; color: #D8708A; border-color: #F8D0DC; }
+        .tag-selector input#tag5:checked + label { background: #F08AAA; color: #fff; border-color: #F08AAA; }
+
+        /* Title input */
+        .form-group input[type="text"] {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid #e0d5c8;
+            border-radius: 10px;
+            font-size: 15px;
+            background: #fdfbf7;
+            font-family: 'Pretendard', 'Apple SD Gothic Neo', sans-serif;
+            box-sizing: border-box;
+        }
+        .form-group input[type="text"]:focus {
+            outline: none;
+            border-color: #B8956A;
+            background: #fff;
+        }
+
+        /* Content textarea */
+        .form-group textarea {
+            width: 100%;
+            padding: 14px;
+            border: 1px solid #e0d5c8;
+            border-radius: 10px;
+            font-size: 15px;
+            background: #fdfbf7;
+            font-family: 'Pretendard', 'Apple SD Gothic Neo', sans-serif;
+            resize: vertical;
+            min-height: 180px;
+            line-height: 1.7;
+            box-sizing: border-box;
+        }
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #B8956A;
+            background: #fff;
+        }
+
+        /* Image upload area */
+        .image-upload-area {
+            border: 2px dashed #D4BC9A;
+            border-radius: 12px;
+            padding: 24px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+        .image-upload-area:hover { border-color: #B8956A; }
+        .image-upload-area p:first-child {
+            color: #B8956A;
+            font-weight: 600;
+            font-size: 15px;
+            margin-bottom: 4px;
+        }
+        .image-upload-area p:last-child {
+            color: #aaa;
+            font-size: 13px;
+        }
+
+        .image-previews {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 12px;
+        }
+        .preview-item {
+            position: relative;
+            width: 100px;
+            height: 100px;
+        }
+        .preview-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 10px;
+            border: 1px solid #e0d5c8;
+        }
+        .preview-item .remove-btn {
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            width: 22px;
+            height: 22px;
+            background: #e53935;
+            color: #fff;
+            border: none;
+            border-radius: 50%;
+            font-size: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+        }
+        .preview-item .remove-btn:hover { background: #c62828; }
+
+        /* Submit button */
+        .btn-submit {
+            width: 100%;
+            padding: 14px;
+            background: #B8956A;
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 8px;
+            font-family: 'Pretendard', 'Apple SD Gothic Neo', sans-serif;
+            transition: background 0.2s;
+        }
+        .btn-submit:hover { background: #A6845C; }
+        .btn-submit:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        @media (max-width: 768px) {
+            .write-box { padding: 24px 18px; }
+            .tag-selector { gap: 6px; }
+            .tag-selector label { padding: 6px 12px; font-size: 13px; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Header -->
+<header class="header">
+    <div class="header-inner">
+        <a href="/main.html" class="logo">
+            <span>🐾</span> Pet Mate
+        </a>
+        <nav class="nav">
+            <a href="/community.html" style="color:#B8956A;">커뮤니티</a>
+            <a href="/matching.html">매칭 잡기</a>
+            <a href="/chat.html">채팅</a>
+            <a href="/mypage.html">마이페이지</a>
+            <a href="#" onclick="logout()" style="color:#e53935;">로그아웃</a>
+        </nav>
+    </div>
+</header>
+
+<div class="write-container">
+    <div class="write-box">
+        <h2>새 글 작성</h2>
+
+        <!-- Tag selector -->
+        <div class="form-group">
+            <label>태그 선택</label>
+            <div class="tag-selector">
+                <input type="radio" name="tag" value="우리 애 자랑" id="tag1">
+                <label for="tag1">🏆 우리 애 자랑</label>
+                <input type="radio" name="tag" value="산책 후기" id="tag2">
+                <label for="tag2">🌿 산책 후기</label>
+                <input type="radio" name="tag" value="질문게시판" id="tag3">
+                <label for="tag3">❓ 질문게시판</label>
+                <input type="radio" name="tag" value="번개산책모집" id="tag4">
+                <label for="tag4">⚡ 번개산책모집</label>
+                <input type="radio" name="tag" value="매칭 후기" id="tag5">
+                <label for="tag5">💕 매칭 후기</label>
+            </div>
+        </div>
+
+        <!-- Title -->
+        <div class="form-group">
+            <label for="title">제목</label>
+            <input type="text" id="title" placeholder="제목을 입력하세요" maxlength="100">
+        </div>
+
+        <!-- Content -->
+        <div class="form-group">
+            <label for="content">내용</label>
+            <textarea id="content" rows="8" placeholder="내용을 입력하세요" maxlength="3000"></textarea>
+        </div>
+
+        <!-- Image upload -->
+        <div class="form-group">
+            <label>사진 첨부 (최대 5장)</label>
+            <div class="image-upload-area" onclick="document.getElementById('imageFiles').click()">
+                <p>클릭하여 사진 추가</p>
+                <p>JPG, PNG 파일 지원</p>
+            </div>
+            <input type="file" id="imageFiles" accept="image/*" multiple style="display:none"
+                   onchange="handleFileSelect(this)">
+            <div class="image-previews" id="imagePreviews"></div>
+        </div>
+
+        <!-- Submit -->
+        <button class="btn-submit" onclick="submitPost()" id="submitBtn">게시하기</button>
+    </div>
+</div>
+
+<!-- Footer -->
+<footer class="footer">
+    <p>&copy; 2026 Pet Mate. All rights reserved.</p>
+</footer>
+
+<script src="/js/common.js"></script>
+<script>
+    if (!isLoggedIn()) location.href = '/index.html';
+    var userKey = getUserKey();
+    var selectedFiles = [];
+
+    function handleFileSelect(input) {
+        var files = Array.from(input.files);
+        files.forEach(function(file) {
+            if (selectedFiles.length >= 5) return;
+            selectedFiles.push(file);
+        });
+        input.value = '';
+        renderPreviews();
+    }
+
+    function renderPreviews() {
+        var container = document.getElementById('imagePreviews');
+        container.innerHTML = selectedFiles.map(function(file, i) {
+            var url = URL.createObjectURL(file);
+            return '<div class="preview-item">' +
+                '<img src="' + url + '">' +
+                '<button class="remove-btn" onclick="removeImage(' + i + ')">X</button>' +
+            '</div>';
+        }).join('');
+    }
+
+    function removeImage(index) {
+        selectedFiles.splice(index, 1);
+        renderPreviews();
+    }
+
+    async function submitPost() {
+        var tagEl = document.querySelector('input[name="tag"]:checked');
+        var title = document.getElementById('title').value.trim();
+        var content = document.getElementById('content').value.trim();
+
+        if (!tagEl) { alert('태그를 선택해주세요.'); return; }
+        if (!title) { alert('제목을 입력해주세요.'); return; }
+        if (!content) { alert('내용을 입력해주세요.'); return; }
+
+        var formData = new FormData();
+        formData.append('userKey', userKey);
+        formData.append('title', title);
+        formData.append('content', content);
+        formData.append('tag', tagEl.value);
+        selectedFiles.forEach(function(file) {
+            formData.append('images', file);
+        });
+
+        var btn = document.getElementById('submitBtn');
+        btn.disabled = true;
+        btn.textContent = '게시 중...';
+
+        try {
+            var result = await apiCall('/api/community/posts', {
+                method: 'POST',
+                body: formData
+            });
+            if (result.success) {
+                location.href = '/community-detail.html?id=' + result.postId;
+            } else {
+                alert(result.message || '게시 실패');
+                btn.disabled = false;
+                btn.textContent = '게시하기';
+            }
+        } catch (e) {
+            alert('오류가 발생했습니다.');
+            btn.disabled = false;
+            btn.textContent = '게시하기';
+        }
+    }
+</script>
+</body>
+</html>

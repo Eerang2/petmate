@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pet Mate - 메인</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+<!-- Header -->
+<header class="header">
+    <div class="header-inner">
+        <a href="/main.html" class="logo">
+            <span>🐾</span> Pet Mate
+        </a>
+        <nav class="nav">
+            <a href="/community.html">커뮤니티</a>
+            <a href="/matching.html">매칭 잡기</a>
+            <a href="/chat.html">채팅</a>
+            <a href="/mypage.html">마이페이지</a>
+            <a href="#" onclick="logout()" style="color:#e53935;">로그아웃</a>
+        </nav>
+    </div>
+</header>
+
+<!-- Hero -->
+<section class="hero">
+    <h1 id="welcomeMsg">안녕하세요!</h1>
+    <p>오늘도 반려동물과 즐거운 산책을 시작해보세요.
+       가까운 산책 메이트를 찾아 함께 걸어보는 건 어떨까요?</p>
+    <a href="/matching.html" class="btn-cta">매칭 시작하기</a>
+</section>
+
+<!-- 소개 -->
+<section class="section">
+    <h2 class="section-title">Pet Mate를 소개합니다</h2>
+    <div class="cards">
+        <div class="card">
+            <div class="card-icon">🤝</div>
+            <h3>산책 메이트 매칭</h3>
+            <p>가까운 지역의 반려동물 보호자와 매칭되어 함께 산책할 수 있습니다.
+               혼자보다 함께할 때 더 즐거운 산책을 경험해보세요.</p>
+        </div>
+        <div class="card">
+            <div class="card-icon">📍</div>
+            <h3>위치 기반 서비스</h3>
+            <p>카카오맵을 활용하여 내 주변의 산책 메이트를 쉽게 찾을 수 있습니다.
+               거리에 따라 가장 가까운 메이트를 추천해드립니다.</p>
+        </div>
+        <div class="card">
+            <div class="card-icon">💬</div>
+            <h3>커뮤니티</h3>
+            <p>반려동물 산책 후기, 추천 산책로, 돌봄 팁 등 다양한 정보를
+               커뮤니티에서 공유해보세요.</p>
+        </div>
+    </div>
+</section>
+
+<!-- 산책의 이로운 점 -->
+<section class="section">
+    <h2 class="section-title">반려동물 산책, 이렇게 좋아요!</h2>
+    <div class="cards">
+        <div class="card">
+            <div class="card-icon">💪</div>
+            <h3>건강 증진</h3>
+            <p>규칙적인 산책은 반려동물의 비만을 예방하고 관절 건강을 유지시켜줍니다.
+               보호자 역시 함께 걸으며 건강한 생활습관을 만들 수 있습니다.</p>
+        </div>
+        <div class="card">
+            <div class="card-icon">🧠</div>
+            <h3>정신 건강 개선</h3>
+            <p>산책 중 다양한 냄새와 소리를 탐험하며 반려동물의 스트레스가 해소됩니다.
+               보호자도 자연 속에서 힐링하는 시간을 가질 수 있어요.</p>
+        </div>
+        <div class="card">
+            <div class="card-icon">🐕</div>
+            <h3>사회성 발달</h3>
+            <p>다른 반려동물과의 만남을 통해 사회성이 향상됩니다.
+               함께 산책하면서 반려동물의 행동 교정에도 도움이 됩니다.</p>
+        </div>
+        <div class="card">
+            <div class="card-icon">❤️</div>
+            <h3>유대감 강화</h3>
+            <p>산책은 보호자와 반려동물 간의 유대감을 깊게 만들어줍니다.
+               함께 시간을 보내며 신뢰와 애정이 쌓여갑니다.</p>
+        </div>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer class="footer">
+    <p>&copy; 2026 Pet Mate. All rights reserved.</p>
+</footer>
+
+<script src="/js/common.js"></script>
+<script>
+    // 비로그인 시 리다이렉트
+    if (!isLoggedIn()) {
+        location.href = '/index.html';
+    }
+
+    // 환영 메시지
+    async function loadUserInfo() {
+        const userKey = getUserKey();
+        try {
+            const user = await apiCall('/api/user/' + userKey);
+            if (user.name) {
+                document.getElementById('welcomeMsg').textContent =
+                    user.name + '님, 안녕하세요!';
+            }
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
+    loadUserInfo();
+</script>
+</body>
+</html>

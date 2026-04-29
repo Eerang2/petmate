@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pet Mate - 로그인</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+<!-- Header -->
+<header class="header">
+    <div class="header-inner">
+        <a href="/index.html" class="logo">
+            <span>🐾</span> Pet Mate
+        </a>
+        <nav class="nav">
+            <a href="/signup.html">회원가입</a>
+        </nav>
+    </div>
+</header>
+
+<!-- Login Form -->
+<div class="auth-container">
+    <div class="auth-box">
+        <h2>로그인</h2>
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="loginId">아이디</label>
+                <input type="text" id="loginId" placeholder="아이디를 입력하세요" required>
+            </div>
+            <div class="form-group">
+                <label for="password">비밀번호</label>
+                <input type="password" id="password" placeholder="비밀번호를 입력하세요" required>
+            </div>
+            <p class="error-msg" id="errorMsg"></p>
+            <button type="submit" class="btn-submit">로그인</button>
+        </form>
+        <div class="auth-link">
+            계정이 없으신가요? <a href="/signup.html">회원가입</a>
+        </div>
+    </div>
+</div>
+
+<footer class="footer">
+    <p>&copy; 2026 Pet Mate. All rights reserved.</p>
+</footer>
+
+<script src="/js/common.js"></script>
+<script>
+    if (isLoggedIn()) {
+        location.href = '/main.html';
+    }
+
+    document.getElementById('loginForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const errorMsg = document.getElementById('errorMsg');
+        errorMsg.style.display = 'none';
+
+        const loginId = document.getElementById('loginId').value;
+        const password = document.getElementById('password').value;
+
+        try {
+            const result = await apiCall('/api/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ loginId, password })
+            });
+
+            if (result.success) {
+                localStorage.setItem('userKey', result.userKey);
+                location.href = '/main.html';
+            } else {
+                errorMsg.textContent = result.message;
+                errorMsg.style.display = 'block';
+            }
+        } catch (err) {
+            errorMsg.textContent = '서버 오류가 발생했습니다.';
+            errorMsg.style.display = 'block';
+        }
+    });
+</script>
+</body>
+</html>

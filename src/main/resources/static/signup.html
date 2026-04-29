@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pet Mate - 회원가입</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=03c9e2b1fa3c84165e10759e6ac3e245&libraries=services"></script>
+</head>
+<body>
+
+<!-- Header -->
+<header class="header">
+    <div class="header-inner">
+        <a href="/index.html" class="logo">
+            <span>🐾</span> Pet Mate
+        </a>
+        <nav class="nav">
+            <a href="/login.html">로그인</a>
+        </nav>
+    </div>
+</header>
+
+<!-- Signup Form -->
+<div class="auth-container wide">
+    <div class="auth-box">
+        <h2>회원가입</h2>
+        <form id="signupForm">
+            <!-- 사람 정보 -->
+            <h3 style="color:#B8956A; margin-bottom:16px; font-size:18px;">주인 정보</h3>
+
+            <div class="form-group">
+                <label for="name">이름</label>
+                <input type="text" id="name" placeholder="이름을 입력하세요" required>
+            </div>
+            <div class="form-group">
+                <label for="age">나이</label>
+                <input type="number" id="age" placeholder="나이를 입력하세요" min="1" max="120" required>
+            </div>
+            <div class="form-group">
+                <label for="loginId">아이디</label>
+                <input type="text" id="loginId" placeholder="아이디를 입력하세요" required>
+            </div>
+            <div class="form-group">
+                <label for="password">비밀번호</label>
+                <input type="password" id="password" placeholder="비밀번호를 입력하세요" required>
+            </div>
+            <div class="form-group">
+                <label for="passwordConfirm">비밀번호 확인</label>
+                <input type="password" id="passwordConfirm" placeholder="비밀번호를 다시 입력하세요" required>
+                <p class="error-msg" id="pwError">비밀번호가 일치하지 않습니다.</p>
+            </div>
+            <div class="form-group">
+                <label>프로필 사진</label>
+                <label class="file-label" for="profileImage">사진 선택</label>
+                <input type="file" id="profileImage" accept="image/*" onchange="previewImage(this, 'profilePreview')">
+                <br>
+                <img id="profilePreview" class="preview-img" alt="프로필 미리보기">
+            </div>
+            <div class="form-group">
+                <label for="locationToggle" style="display:flex; align-items:center; gap:8px; cursor:pointer; margin-bottom:8px;">
+                    위치 권한
+                    <input type="checkbox" id="locationToggle" checked style="accent-color:#B8956A; width:18px; height:18px; cursor:pointer;">
+                    <span id="locationToggleLabel" style="font-size:13px; color:#888;">켜짐</span>
+                </label>
+                <div id="mapSection">
+                    <div style="display:flex; gap:6px; margin-bottom:8px;">
+                        <input type="text" id="addressSearch" placeholder="주소를 검색하세요" style="flex:1;">
+                        <button type="button" id="searchBtn" class="btn-submit" style="width:auto; padding:0 16px; margin:0; font-size:14px;">검색</button>
+                    </div>
+                    <div id="map" class="map-container"></div>
+                </div>
+                <input type="hidden" id="latitude">
+                <input type="hidden" id="longitude">
+                <input type="hidden" id="address">
+            </div>
+
+            <hr style="margin: 30px 0; border-color: #e0e0e0;">
+
+            <!-- 동물 정보 -->
+            <h3 style="color:#B8956A; margin-bottom:16px; font-size:18px;">반려동물 정보</h3>
+
+            <div class="form-group">
+                <label>동물 사진</label>
+                <label class="file-label" for="petImage">사진 선택</label>
+                <input type="file" id="petImage" accept="image/*" onchange="previewImage(this, 'petPreview')">
+                <br>
+                <img id="petPreview" class="preview-img square" alt="펫 미리보기">
+            </div>
+            <div class="form-group">
+                <label for="petType">동물 종류</label>
+                <select id="petType" onchange="toggleDogBreed()" required>
+                    <option value="">선택하세요</option>
+                    <option value="강아지">강아지</option>
+                    <option value="고양이">고양이</option>
+                    <option value="햄스터">햄스터</option>
+                    <option value="토끼">토끼</option>
+                    <option value="새">새</option>
+                    <option value="기타">기타</option>
+                </select>
+            </div>
+            <div class="form-group" id="dogBreedGroup">
+                <label for="petBreed">견종</label>
+                <select id="petBreed">
+                    <option value="">선택하세요</option>
+                    <option value="시바견">시바견</option>
+                    <option value="진돗개">진돗개</option>
+                    <option value="말티즈">말티즈</option>
+                    <option value="푸들">푸들</option>
+                    <option value="포메라니안">포메라니안</option>
+                    <option value="골든 리트리버">골든 리트리버</option>
+                    <option value="래브라도 리트리버">래브라도 리트리버</option>
+                    <option value="비숑 프리제">비숑 프리제</option>
+                    <option value="치와와">치와와</option>
+                    <option value="웰시코기">웰시코기</option>
+                    <option value="불독">불독</option>
+                    <option value="허스키">허스키</option>
+                    <option value="믹스견">믹스견</option>
+                    <option value="기타">기타</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="personality">성격</label>
+                <textarea id="personality" placeholder="반려동물의 성격을 적어주세요 (예: 활발하고 사람을 좋아함)"></textarea>
+            </div>
+
+            <p class="error-msg" id="errorMsg"></p>
+            <button type="submit" class="btn-submit">회원가입</button>
+        </form>
+        <div class="auth-link">
+            이미 계정이 있으신가요? <a href="/login.html">로그인</a>
+        </div>
+    </div>
+</div>
+
+<footer class="footer">
+    <p>&copy; 2026 Pet Mate. All rights reserved.</p>
+</footer>
+
+<script src="/js/common.js"></script>
+<script>
+    if (isLoggedIn()) {
+        location.href = '/main.html';
+    }
+
+    // 카카오맵 초기화
+    let map, marker, geocoder;
+
+    function initMap() {
+        const mapContainer = document.getElementById('map');
+        const mapOption = {
+            center: new kakao.maps.LatLng(37.5665, 126.9780), // 서울시청
+            level: 3
+        };
+        map = new kakao.maps.Map(mapContainer, mapOption);
+        marker = new kakao.maps.Marker({ position: map.getCenter(), map: map });
+        geocoder = new kakao.maps.services.Geocoder();
+
+        // 지도 클릭 시 마커 이동 및 좌표 추출
+        kakao.maps.event.addListener(map, 'click', function(mouseEvent) {
+            const latlng = mouseEvent.latLng;
+            marker.setPosition(latlng);
+            document.getElementById('latitude').value = latlng.getLat();
+            document.getElementById('longitude').value = latlng.getLng();
+
+            // 좌표 → 주소 변환
+            geocoder.coord2Address(latlng.getLng(), latlng.getLat(), function(result, status) {
+                if (status === kakao.maps.services.Status.OK) {
+                    const addr = result[0].address.address_name;
+                    document.getElementById('address').value = addr;
+                    document.getElementById('addressSearch').value = addr;
+                }
+            });
+        });
+    }
+
+    // 위치 권한 토글
+    const locationToggle = document.getElementById('locationToggle');
+    const mapSection = document.getElementById('mapSection');
+    const toggleLabel = document.getElementById('locationToggleLabel');
+
+    locationToggle.addEventListener('change', function() {
+        if (this.checked) {
+            mapSection.style.display = 'block';
+            toggleLabel.textContent = '켜짐';
+            // 지도 다시 보일 때 레이아웃 갱신
+            setTimeout(() => map.relayout(), 0);
+        } else {
+            mapSection.style.display = 'none';
+            toggleLabel.textContent = '꺼짐';
+            // 위치 정보 초기화
+            document.getElementById('latitude').value = '';
+            document.getElementById('longitude').value = '';
+            document.getElementById('address').value = '';
+            document.getElementById('addressSearch').value = '';
+        }
+    });
+
+    // 주소 검색 함수
+    function searchAddress() {
+        const keyword = document.getElementById('addressSearch').value;
+        if (!keyword) return;
+
+        geocoder.addressSearch(keyword, function(result, status) {
+            if (status === kakao.maps.services.Status.OK) {
+                const coords = new kakao.maps.LatLng(result[0].y, result[0].x);
+                map.setCenter(coords);
+                marker.setPosition(coords);
+                document.getElementById('latitude').value = result[0].y;
+                document.getElementById('longitude').value = result[0].x;
+                document.getElementById('address').value = result[0].address_name;
+                document.getElementById('addressSearch').value = result[0].address_name;
+            } else {
+                alert('검색 결과가 없습니다. 주소를 다시 확인해주세요.');
+            }
+        });
+    }
+
+    // 엔터 키로 검색
+    document.getElementById('addressSearch').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            searchAddress();
+        }
+    });
+
+    // 검색 버튼 클릭
+    document.getElementById('searchBtn').addEventListener('click', searchAddress);
+
+    // 폼 제출
+    document.getElementById('signupForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const errorMsg = document.getElementById('errorMsg');
+        const pwError = document.getElementById('pwError');
+        errorMsg.style.display = 'none';
+        pwError.style.display = 'none';
+
+        const password = document.getElementById('password').value;
+        const passwordConfirm = document.getElementById('passwordConfirm').value;
+
+        if (password !== passwordConfirm) {
+            pwError.style.display = 'block';
+            return;
+        }
+
+        const data = {
+            name: document.getElementById('name').value,
+            age: parseInt(document.getElementById('age').value) || null,
+            loginId: document.getElementById('loginId').value,
+            password: password,
+            address: document.getElementById('address').value,
+            latitude: parseFloat(document.getElementById('latitude').value) || null,
+            longitude: parseFloat(document.getElementById('longitude').value) || null,
+            petType: document.getElementById('petType').value,
+            petBreed: document.getElementById('petBreed').value,
+            personality: document.getElementById('personality').value
+        };
+
+        const formData = new FormData();
+        formData.append('data', new Blob([JSON.stringify(data)], { type: 'application/json' }));
+
+        const profileFile = document.getElementById('profileImage').files[0];
+        const petFile = document.getElementById('petImage').files[0];
+        if (profileFile) formData.append('profileImage', profileFile);
+        if (petFile) formData.append('petImage', petFile);
+
+        try {
+            const response = await fetch('/api/signup', { method: 'POST', body: formData });
+            const result = await response.json();
+
+            if (result.success) {
+                alert('회원가입이 완료되었습니다!');
+                location.href = '/login.html';
+            } else {
+                errorMsg.textContent = result.message;
+                errorMsg.style.display = 'block';
+            }
+        } catch (err) {
+            errorMsg.textContent = '서버 오류가 발생했습니다.';
+            errorMsg.style.display = 'block';
+        }
+    });
+
+    // 카카오맵 로드 후 초기화
+    try { initMap(); } catch(e) { console.log('카카오맵 API 키를 설정해주세요.'); }
+</script>
+</body>
+</html>

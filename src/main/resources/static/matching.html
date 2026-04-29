@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pet Mate - 매칭 잡기</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .matching-container {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+        /* 지역 선택 */
+        .region-select-box {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+        .region-select-box select {
+            padding: 12px 24px;
+            border: 2px solid #B8956A;
+            border-radius: 12px;
+            font-size: 16px;
+            color: #333;
+            background: #fff;
+            cursor: pointer;
+            min-width: 200px;
+        }
+        .region-select-box button {
+            padding: 12px 28px;
+            background: #B8956A;
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-left: 8px;
+        }
+        .region-select-box button:hover { background: #A6845C; }
+
+        /* 매칭 카드 */
+        .match-card-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            min-height: 420px;
+        }
+        .match-card {
+            background: #fff;
+            border-radius: 20px;
+            box-shadow: 0 6px 24px rgba(0,0,0,0.1);
+            overflow: hidden;
+            width: 600px;
+            position: relative;
+        }
+        .card-slider {
+            display: flex;
+            transition: transform 0.4s ease;
+            width: 200%;
+        }
+        .card-slide {
+            width: 50%;
+            min-height: 400px;
+            padding: 32px;
+            flex-shrink: 0;
+        }
+
+        /* 주인 슬라이드 */
+        .owner-slide {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .owner-slide .profile-photo {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid #B8956A;
+            margin-bottom: 20px;
+        }
+        .info-table {
+            width: 100%;
+            max-width: 400px;
+        }
+        .info-row {
+            display: flex;
+            padding: 10px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .info-label {
+            width: 80px;
+            font-weight: 700;
+            color: #B8956A;
+            font-size: 14px;
+        }
+        .info-value {
+            flex: 1;
+            font-size: 14px;
+            color: #555;
+        }
+
+        /* 펫 슬라이드 */
+        .pet-slide {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .pet-slide .pet-photo {
+            width: 120px;
+            height: 120px;
+            border-radius: 16px;
+            object-fit: cover;
+            border: 4px solid #D4A574;
+            margin-bottom: 20px;
+        }
+
+        /* 슬라이드 화살표 (카드 내부 - 주인/펫 전환) */
+        .slide-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #B8956A;
+            color: #fff;
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            font-size: 18px;
+            cursor: pointer;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .slide-arrow:hover { background: #A6845C; }
+        .slide-arrow.right { right: 8px; }
+        .slide-arrow.left { left: 8px; display: none; }
+
+        /* 매칭 버튼 */
+        .match-actions {
+            text-align: center;
+            padding: 0 32px 24px;
+        }
+        .btn-match {
+            padding: 14px 48px;
+            background: linear-gradient(135deg, #B8956A, #D4BC9A);
+            color: #fff;
+            border: none;
+            border-radius: 30px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .btn-match:hover { transform: scale(1.05); }
+        .btn-match:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* 다음 사람 화살표 */
+        .next-person-arrow {
+            background: none;
+            border: 2px solid #B8956A;
+            color: #B8956A;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            font-size: 24px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+        .next-person-arrow:hover {
+            background: #B8956A;
+            color: #fff;
+        }
+        .prev-person-arrow {
+            background: none;
+            border: 2px solid #aaa;
+            color: #aaa;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            font-size: 24px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+        .prev-person-arrow:hover {
+            background: #aaa;
+            color: #fff;
+        }
+
+        /* 슬라이드 인디케이터 */
+        .slide-indicator {
+            text-align: center;
+            padding: 12px;
+            font-size: 13px;
+            color: #999;
+        }
+        .slide-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #ddd;
+            margin: 0 4px;
+        }
+        .slide-dot.active { background: #B8956A; }
+
+        /* 빈 상태 */
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+            color: #999;
+        }
+        .empty-state .icon { font-size: 64px; margin-bottom: 16px; }
+        .empty-state p { font-size: 16px; }
+
+        /* 카운터 */
+        .person-counter {
+            text-align: center;
+            margin-bottom: 12px;
+            font-size: 14px;
+            color: #888;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Header -->
+<header class="header">
+    <div class="header-inner">
+        <a href="/main.html" class="logo">
+            <span>🐾</span> Pet Mate
+        </a>
+        <nav class="nav">
+            <a href="/community.html">커뮤니티</a>
+            <a href="/matching.html" style="color:#B8956A;">매칭 잡기</a>
+            <a href="/chat.html">채팅</a>
+            <a href="/mypage.html">마이페이지</a>
+            <a href="#" onclick="logout()" style="color:#e53935;">로그아웃</a>
+        </nav>
+    </div>
+</header>
+
+<div class="matching-container">
+    <h2 class="section-title">산책 메이트 찾기</h2>
+
+    <!-- 지역 선택 -->
+    <div class="region-select-box">
+        <select id="regionSelect">
+            <option value="">전체 지역</option>
+            <option value="서울">서울</option>
+            <option value="부산">부산</option>
+            <option value="대구">대구</option>
+            <option value="인천">인천</option>
+            <option value="광주">광주</option>
+            <option value="대전">대전</option>
+            <option value="울산">울산</option>
+            <option value="세종">세종</option>
+            <option value="경기">경기</option>
+            <option value="강원">강원</option>
+            <option value="충북">충북</option>
+            <option value="충남">충남</option>
+            <option value="전북">전북</option>
+            <option value="전남">전남</option>
+            <option value="경북">경북</option>
+            <option value="경남">경남</option>
+            <option value="제주">제주</option>
+        </select>
+        <button onclick="searchNearby()">검색</button>
+    </div>
+
+    <!-- 매칭 카드 영역 -->
+    <div id="matchArea">
+        <div class="empty-state">
+            <div class="icon">🔍</div>
+            <p>지역을 선택하고 검색해보세요!</p>
+        </div>
+    </div>
+</div>
+
+<footer class="footer">
+    <p>&copy; 2026 Pet Mate. All rights reserved.</p>
+</footer>
+
+<script src="/js/common.js"></script>
+<script>
+    if (!isLoggedIn()) location.href = '/index.html';
+
+    const userKey = getUserKey();
+    let matchUsers = [];
+    let currentIndex = 0;
+
+    async function searchNearby() {
+        const region = document.getElementById('regionSelect').value;
+        try {
+            matchUsers = await apiCall('/api/match/nearby?userKey=' + userKey + '&region=' + encodeURIComponent(region));
+            currentIndex = 0;
+            renderCard();
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
+    function renderCard() {
+        const area = document.getElementById('matchArea');
+
+        if (!matchUsers || matchUsers.length === 0) {
+            area.innerHTML = `
+                <div class="empty-state">
+                    <div class="icon">😢</div>
+                    <p>해당 지역에 매칭 가능한 사용자가 없습니다.</p>
+                </div>`;
+            return;
+        }
+
+        const user = matchUsers[currentIndex];
+        const grade = user.grade || 'BRONZE';
+
+        // 등급별 프로필 테두리
+        let gradeClass = '';
+        if (grade === 'SILVER') gradeClass = 'grade-border-silver';
+        else if (grade === 'GOLD') gradeClass = 'grade-border-gold';
+
+        // 등급 배지
+        let gradeBadge = '';
+        if (grade === 'SILVER') gradeBadge = '<span class="grade-badge grade-badge-silver">실버 집사</span>';
+        if (grade === 'GOLD') gradeBadge = '<span class="grade-badge grade-badge-gold">골드 집사</span>';
+
+        area.innerHTML = `
+            <div class="person-counter">${currentIndex + 1} / ${matchUsers.length} 명</div>
+            <div class="match-card-wrapper">
+                <button class="prev-person-arrow" onclick="prevPerson()" ${currentIndex === 0 ? 'disabled style="opacity:0.3"' : ''}>&#8249;</button>
+                <div>
+                    <div class="match-card">
+                        <button class="slide-arrow left" onclick="slideToOwner()">&#8249;</button>
+                        <button class="slide-arrow right" onclick="slideToPet()">&#8250;</button>
+                        <div class="card-slider" id="cardSlider">
+                            <!-- 주인 정보 -->
+                            <div class="card-slide owner-slide">
+                                <img class="profile-photo ${gradeClass}" src="${user.profileImage || 'https://via.placeholder.com/120?text=No+Photo'}" alt="프로필">
+                                <div class="info-table">
+                                    <div class="info-row">
+                                        <span class="info-label">이름</span>
+                                        <span class="info-value">${user.name || '-'}${gradeBadge}</span>
+                                    </div>
+                                    <div class="info-row">
+                                        <span class="info-label">나이</span>
+                                        <span class="info-value">${user.age ? user.age + '세' : '-'}</span>
+                                    </div>
+                                    <div class="info-row">
+                                        <span class="info-label">지역</span>
+                                        <span class="info-value">${user.address || '-'}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- 동물 정보 -->
+                            <div class="card-slide pet-slide">
+                                <img class="pet-photo" src="${user.petImage || 'https://via.placeholder.com/120?text=No+Photo'}" alt="펫">
+                                <div class="info-table">
+                                    <div class="info-row">
+                                        <span class="info-label">종류</span>
+                                        <span class="info-value">${user.petType || '-'}</span>
+                                    </div>
+                                    <div class="info-row">
+                                        <span class="info-label">품종</span>
+                                        <span class="info-value">${user.petBreed || '-'}</span>
+                                    </div>
+                                    <div class="info-row">
+                                        <span class="info-label">성격</span>
+                                        <span class="info-value">${user.personality || '-'}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="slide-indicator">
+                            <span class="slide-dot active" id="dot0"></span>
+                            <span class="slide-dot" id="dot1"></span>
+                            <span style="margin-left:8px; font-size:12px; color:#aaa;" id="slideLabel">주인 정보</span>
+                        </div>
+                    </div>
+                    <div class="match-actions" style="margin-top:16px;">
+                        <button class="btn-match" onclick="sendMatch(${user.id})" id="matchBtn">매칭 요청</button>
+                    </div>
+                </div>
+                <button class="next-person-arrow" onclick="nextPerson()" ${currentIndex >= matchUsers.length - 1 ? 'disabled style="opacity:0.3"' : ''}>&#8250;</button>
+            </div>`;
+    }
+
+    let isSlid = false;
+
+    function slideToPet() {
+        const slider = document.getElementById('cardSlider');
+        slider.style.transform = 'translateX(-50%)';
+        document.querySelector('.slide-arrow.right').style.display = 'none';
+        document.querySelector('.slide-arrow.left').style.display = 'flex';
+        document.getElementById('dot0').classList.remove('active');
+        document.getElementById('dot1').classList.add('active');
+        document.getElementById('slideLabel').textContent = '펫 정보';
+        isSlid = true;
+    }
+
+    function slideToOwner() {
+        const slider = document.getElementById('cardSlider');
+        slider.style.transform = 'translateX(0)';
+        document.querySelector('.slide-arrow.right').style.display = 'flex';
+        document.querySelector('.slide-arrow.left').style.display = 'none';
+        document.getElementById('dot0').classList.add('active');
+        document.getElementById('dot1').classList.remove('active');
+        document.getElementById('slideLabel').textContent = '주인 정보';
+        isSlid = false;
+    }
+
+    function nextPerson() {
+        if (currentIndex < matchUsers.length - 1) {
+            currentIndex++;
+            renderCard();
+        }
+    }
+
+    function prevPerson() {
+        if (currentIndex > 0) {
+            currentIndex--;
+            renderCard();
+        }
+    }
+
+    async function sendMatch(receiverId) {
+        const btn = document.getElementById('matchBtn');
+        btn.disabled = true;
+        btn.textContent = '요청 중...';
+
+        try {
+            const result = await apiCall('/api/match/request', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ senderId: parseInt(userKey), receiverId: receiverId })
+            });
+
+            if (result.success) {
+                btn.textContent = '요청 완료!';
+                btn.style.background = '#888';
+            } else {
+                btn.textContent = result.message || '요청 실패';
+                btn.disabled = false;
+            }
+        } catch (e) {
+            btn.textContent = '매칭 요청';
+            btn.disabled = false;
+        }
+    }
+
+    // 페이지 로드 시 전체 검색
+    searchNearby();
+</script>
+</body>
+</html>

@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pet Mate - 관리자</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .admin-container {
+            max-width: 1100px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+        .admin-title {
+            font-size: 24px;
+            font-weight: 800;
+            color: #5a4a3a;
+            margin-bottom: 24px;
+        }
+
+        /* 통계 카드 */
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 28px;
+        }
+        .stat-card {
+            background: #fffdf9;
+            border-radius: 14px;
+            padding: 20px;
+            border: 1px solid #f0e8dd;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+        .stat-card .stat-label { font-size: 13px; color: #999; margin-bottom: 6px; }
+        .stat-card .stat-value { font-size: 24px; font-weight: 800; color: #5a4a3a; }
+        .stat-card .stat-sub { font-size: 12px; color: #B8956A; margin-top: 4px; }
+
+        /* 필터 바 */
+        .filter-bar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .filter-bar input {
+            padding: 10px 14px;
+            border: 2px solid #e8ddd0;
+            border-radius: 10px;
+            font-size: 14px;
+            background: #fffdf9;
+            outline: none;
+            transition: border-color 0.2s;
+            flex: 1;
+            min-width: 200px;
+            font-family: 'Pretendard', 'Apple SD Gothic Neo', sans-serif;
+        }
+        .filter-bar input:focus { border-color: #B8956A; }
+        .filter-btn {
+            padding: 10px 18px;
+            border: 2px solid #e8ddd0;
+            border-radius: 10px;
+            background: #fffdf9;
+            font-size: 14px;
+            font-weight: 600;
+            color: #7a6a56;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: 'Pretendard', 'Apple SD Gothic Neo', sans-serif;
+        }
+        .filter-btn:hover { border-color: #B8956A; color: #B8956A; }
+        .filter-btn.active { background: #B8956A; color: #fff; border-color: #B8956A; }
+
+        /* 테이블 */
+        .table-wrap {
+            background: #fffdf9;
+            border-radius: 16px;
+            border: 1px solid #f0e8dd;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+        thead th {
+            background: #f7f2ec;
+            padding: 14px 16px;
+            text-align: left;
+            font-weight: 700;
+            color: #6b5b4a;
+            white-space: nowrap;
+            border-bottom: 2px solid #e8ddd0;
+        }
+        tbody td {
+            padding: 14px 16px;
+            border-bottom: 1px solid #f0e8dd;
+            color: #555;
+            white-space: nowrap;
+        }
+        tbody tr:hover { background: #fdf8f2; }
+        tbody tr:last-child td { border-bottom: none; }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+        .badge.BRONZE { background: #f0f0f0; color: #888; }
+        .badge.SILVER { background: #F5F5F5; color: #888; }
+        .badge.GOLD { background: #FFF8E7; color: #D4A843; }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+        .status-badge.completed { background: #E8F5E9; color: #4CAF50; }
+        .status-badge.refunded { background: #FFF3E0; color: #FF9800; }
+
+        .btn-refund {
+            padding: 6px 14px;
+            border: 1px solid #e53935;
+            background: #fff;
+            color: #e53935;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: 'Pretendard', 'Apple SD Gothic Neo', sans-serif;
+        }
+        .btn-refund:hover { background: #e53935; color: #fff; }
+        .btn-refund:disabled { opacity: 0.4; cursor: default; border-color: #ccc; color: #ccc; }
+        .btn-refund:disabled:hover { background: #fff; color: #ccc; }
+
+        .empty-row { text-align: center; color: #999; padding: 60px 20px !important; }
+
+        @media (max-width: 768px) {
+            .stat-grid { grid-template-columns: repeat(2, 1fr); }
+            .filter-bar { flex-direction: column; }
+            .filter-bar input { min-width: unset; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Header -->
+<header class="header">
+    <div class="header-inner">
+        <a href="/main.html" class="logo">
+            <span>🐾</span> Pet Mate
+        </a>
+        <nav class="nav">
+            <a href="/admin.html" style="color:#B8956A;">관리자</a>
+            <a href="#" onclick="logout()" style="color:#e53935;">로그아웃</a>
+        </nav>
+    </div>
+</header>
+
+<div class="admin-container">
+    <h2 class="admin-title">결제 관리</h2>
+
+    <!-- 통계 -->
+    <div class="stat-grid">
+        <div class="stat-card">
+            <div class="stat-label">총 결제 건수</div>
+            <div class="stat-value" id="statTotal">0</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">총 결제 금액</div>
+            <div class="stat-value" id="statAmount">0원</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">실버 집사</div>
+            <div class="stat-value" id="statSilver">0명</div>
+            <div class="stat-sub">900원/월</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">골드 집사</div>
+            <div class="stat-value" id="statGold">0명</div>
+            <div class="stat-sub">1,000원/월</div>
+        </div>
+    </div>
+
+    <!-- 필터 -->
+    <div class="filter-bar">
+        <input type="text" id="searchInput" placeholder="회원명 검색..." onkeypress="if(event.key==='Enter') applyFilter()">
+        <button class="filter-btn active" data-status="전체" onclick="setStatusFilter(this)">전체</button>
+        <button class="filter-btn" data-status="완료" onclick="setStatusFilter(this)">완료</button>
+        <button class="filter-btn" data-status="환불" onclick="setStatusFilter(this)">환불</button>
+    </div>
+
+    <!-- 테이블 -->
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>결제일</th>
+                    <th>회원명</th>
+                    <th>등급</th>
+                    <th>결제 수단</th>
+                    <th>금액</th>
+                    <th>상태</th>
+                    <th>관리</th>
+                </tr>
+            </thead>
+            <tbody id="paymentTableBody">
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<footer class="footer">
+    <p>&copy; 2026 Pet Mate. All rights reserved.</p>
+</footer>
+
+<script src="/js/common.js"></script>
+<script>
+    if (!isLoggedIn()) location.href = '/index.html';
+
+    let currentStatus = '전체';
+    let allPayments = [];
+
+    const gradeLabel = { BRONZE: '브론즈 집사', SILVER: '실버 집사', GOLD: '골드 집사' };
+    const statusLabel = { COMPLETED: '완료', REFUNDED: '환불' };
+    const methodLabel = { card: '카드', trans: '계좌이체', phone: '휴대폰' };
+
+    // API에서 결제 내역 로드
+    async function loadPayments() {
+        try {
+            const params = new URLSearchParams();
+            const keyword = document.getElementById('searchInput').value.trim();
+
+            if (keyword) {
+                params.append('keyword', keyword);
+            } else if (currentStatus !== '전체') {
+                params.append('status', currentStatus === '완료' ? 'COMPLETED' : 'REFUNDED');
+            }
+
+            allPayments = await apiCall('/api/payment/list?' + params.toString());
+            renderStats();
+            renderTable();
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
+    function setStatusFilter(btn) {
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentStatus = btn.dataset.status;
+        loadPayments();
+    }
+
+    function applyFilter() {
+        loadPayments();
+    }
+
+    function renderStats() {
+        const completed = allPayments.filter(p => p.status === 'COMPLETED');
+        const totalAmount = completed.reduce((sum, p) => sum + p.amount, 0);
+        const silverCount = completed.filter(p => p.grade === 'SILVER').length;
+        const goldCount = completed.filter(p => p.grade === 'GOLD').length;
+
+        document.getElementById('statTotal').textContent = completed.length;
+        document.getElementById('statAmount').textContent = totalAmount.toLocaleString() + '원';
+        document.getElementById('statSilver').textContent = silverCount + '명';
+        document.getElementById('statGold').textContent = goldCount + '명';
+    }
+
+    function renderTable() {
+        const tbody = document.getElementById('paymentTableBody');
+
+        if (!allPayments || allPayments.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="7" class="empty-row">결제 내역이 없습니다.</td></tr>';
+            return;
+        }
+
+        tbody.innerHTML = allPayments.map(p => `
+            <tr>
+                <td>${p.paidAt ? p.paidAt.substring(0, 10) : '-'}</td>
+                <td>${p.userName || p.buyerName}</td>
+                <td><span class="badge ${p.grade}">${gradeLabel[p.grade] || p.grade}</span></td>
+                <td>${methodLabel[p.payMethod] || p.payMethod}</td>
+                <td>${p.amount.toLocaleString()}원</td>
+                <td><span class="status-badge ${p.status === 'COMPLETED' ? 'completed' : 'refunded'}">${statusLabel[p.status]}</span></td>
+                <td>
+                    <button class="btn-refund" ${p.status === 'REFUNDED' ? 'disabled' : ''} onclick="refundPayment(${p.id})">
+                        ${p.status === 'REFUNDED' ? '환불 완료' : '환불'}
+                    </button>
+                </td>
+            </tr>`).join('');
+    }
+
+    async function refundPayment(id) {
+        if (!confirm('정말 환불 처리하시겠습니까?')) return;
+
+        try {
+            const result = await fetch('/api/payment/refund/' + id, { method: 'POST' }).then(r => r.json());
+            if (result.success) {
+                alert('환불 처리되었습니다.');
+                loadPayments();
+            } else {
+                alert('환불 실패: ' + (result.message || '서버 오류'));
+            }
+        } catch (e) {
+            alert('환불 요청 실패');
+        }
+    }
+
+    loadPayments();
+</script>
+</body>
+</html>

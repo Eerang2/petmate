@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pet Mate - 마이페이지</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=03c9e2b1fa3c84165e10759e6ac3e245&libraries=services"></script>
+</head>
+<body>
+
+<!-- Header -->
+<header class="header">
+    <div class="header-inner">
+        <a href="/main.html" class="logo">
+            <span>🐾</span> Pet Mate
+        </a>
+        <nav class="nav">
+            <a href="/community.html">커뮤니티</a>
+            <a href="/matching.html">매칭 잡기</a>
+            <a href="/chat.html">채팅</a>
+            <a href="/mypage.html" style="color:#B8956A;">마이페이지</a>
+            <a href="#" onclick="logout()" style="color:#e53935;">로그아웃</a>
+        </nav>
+    </div>
+</header>
+
+<!-- Profile Header -->
+<div class="mypage-container">
+    <div class="profile-header">
+        <img id="profileImg" src="" alt="프로필">
+        <h2><span id="userName">-</span><span id="gradeBadge" class="grade-badge"></span></h2>
+        <p id="userAddress">-</p>
+        <a href="/membership.html" style="display:inline-block; margin-top:12px; padding:8px 20px; background:#B8956A; color:#fff; border-radius:20px; font-size:13px; font-weight:700; transition:background 0.2s;">등급 관리</a>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('owner')">주인 정보</button>
+        <button class="tab-btn" onclick="switchTab('pet')">펫 정보</button>
+    </div>
+
+    <!-- 주인 정보 탭 -->
+    <div class="tab-content active" id="ownerTab">
+        <div class="auth-box">
+            <form id="ownerForm">
+                <div class="form-group">
+                    <label for="editName">이름</label>
+                    <input type="text" id="editName">
+                </div>
+                <div class="form-group">
+                    <label>프로필 사진</label>
+                    <label class="file-label" for="editProfileImage">사진 변경</label>
+                    <input type="file" id="editProfileImage" accept="image/*" onchange="previewImage(this, 'editProfilePreview')">
+                    <br>
+                    <img id="editProfilePreview" class="preview-img" alt="프로필 미리보기">
+                </div>
+                <div class="form-group">
+                    <label for="editAddressSearch">거주지</label>
+                    <input type="text" id="editAddressSearch" placeholder="주소를 검색하세요">
+                    <div id="editMap" class="map-container"></div>
+                    <input type="hidden" id="editLatitude">
+                    <input type="hidden" id="editLongitude">
+                    <input type="hidden" id="editAddress">
+                </div>
+                <button type="submit" class="btn-submit">주인 정보 수정</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 펫 정보 탭 -->
+    <div class="tab-content" id="petTab">
+        <div class="auth-box">
+            <div class="profile-header" style="margin-bottom:20px;">
+                <img id="petImg" src="" alt="펫 사진" style="border-radius:12px;">
+            </div>
+            <form id="petForm">
+                <div class="form-group">
+                    <label>동물 사진</label>
+                    <label class="file-label" for="editPetImage">사진 변경</label>
+                    <input type="file" id="editPetImage" accept="image/*" onchange="previewImage(this, 'editPetPreview')">
+                    <br>
+                    <img id="editPetPreview" class="preview-img square" alt="펫 미리보기">
+                </div>
+                <div class="form-group">
+                    <label for="editPetType">동물 종류</label>
+                    <select id="editPetType" onchange="toggleEditDogBreed()">
+                        <option value="">선택하세요</option>
+                        <option value="강아지">강아지</option>
+                        <option value="고양이">고양이</option>
+                        <option value="햄스터">햄스터</option>
+                        <option value="토끼">토끼</option>
+                        <option value="새">새</option>
+                        <option value="기타">기타</option>
+                    </select>
+                </div>
+                <div class="form-group" id="editDogBreedGroup" style="display:none;">
+                    <label for="editPetBreed">견종</label>
+                    <select id="editPetBreed">
+                        <option value="">선택하세요</option>
+                        <option value="시바견">시바견</option>
+                        <option value="진돗개">진돗개</option>
+                        <option value="말티즈">말티즈</option>
+                        <option value="푸들">푸들</option>
+                        <option value="포메라니안">포메라니안</option>
+                        <option value="골든 리트리버">골든 리트리버</option>
+                        <option value="래브라도 리트리버">래브라도 리트리버</option>
+                        <option value="비숑 프리제">비숑 프리제</option>
+                        <option value="치와와">치와와</option>
+                        <option value="웰시코기">웰시코기</option>
+                        <option value="불독">불독</option>
+                        <option value="허스키">허스키</option>
+                        <option value="믹스견">믹스견</option>
+                        <option value="기타">기타</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="editPersonality">성격</label>
+                    <textarea id="editPersonality" placeholder="반려동물의 성격을 적어주세요"></textarea>
+                </div>
+                <button type="submit" class="btn-submit">펫 정보 수정</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<footer class="footer">
+    <p>&copy; 2026 Pet Mate. All rights reserved.</p>
+</footer>
+
+<script src="/js/common.js"></script>
+<script>
+    if (!isLoggedIn()) {
+        location.href = '/index.html';
+    }
+
+    const userKey = getUserKey();
+    let editMap, editMarker, editGeocoder;
+
+    // 탭 전환
+    function switchTab(tab) {
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+
+        if (tab === 'owner') {
+            document.querySelector('.tab-btn:first-child').classList.add('active');
+            document.getElementById('ownerTab').classList.add('active');
+            // 지도 리사이즈
+            setTimeout(() => { if (editMap) editMap.relayout(); }, 100);
+        } else {
+            document.querySelector('.tab-btn:last-child').classList.add('active');
+            document.getElementById('petTab').classList.add('active');
+        }
+    }
+
+    function toggleEditDogBreed() {
+        const petType = document.getElementById('editPetType');
+        const group = document.getElementById('editDogBreedGroup');
+        group.style.display = petType.value === '강아지' ? 'block' : 'none';
+    }
+
+    // 유저 정보 로드
+    async function loadUser() {
+        const user = await apiCall('/api/user/' + userKey);
+
+        // 프로필 헤더
+        const profileImg = document.getElementById('profileImg');
+        profileImg.src = user.profileImage || 'https://via.placeholder.com/100?text=No+Image';
+        document.getElementById('userName').textContent = user.name || '-';
+        document.getElementById('userAddress').textContent = user.address || '-';
+
+        // 등급 테두리
+        const grade = user.grade || 'BRONZE';
+        profileImg.classList.remove('grade-border-silver', 'grade-border-gold');
+
+        const badgeEl = document.getElementById('gradeBadge');
+        badgeEl.className = 'grade-badge';
+        badgeEl.textContent = '';
+
+        if (grade === 'SILVER') {
+            profileImg.classList.add('grade-border-silver');
+            badgeEl.classList.add('grade-badge-silver');
+            badgeEl.textContent = '실버 집사';
+        } else if (grade === 'GOLD') {
+            profileImg.classList.add('grade-border-gold');
+            badgeEl.classList.add('grade-badge-gold');
+            badgeEl.textContent = '골드 집사';
+        }
+
+        // 주인 정보 폼
+        document.getElementById('editName').value = user.name || '';
+        document.getElementById('editAddressSearch').value = user.address || '';
+        document.getElementById('editAddress').value = user.address || '';
+        document.getElementById('editLatitude').value = user.latitude || '';
+        document.getElementById('editLongitude').value = user.longitude || '';
+
+        // 지도 초기화
+        initEditMap(user.latitude, user.longitude);
+
+        // 펫 정보
+        const petImg = document.getElementById('petImg');
+        petImg.src = user.petImage || 'https://via.placeholder.com/100?text=No+Image';
+        document.getElementById('editPetType').value = user.petType || '';
+        document.getElementById('editPetBreed').value = user.petBreed || '';
+        document.getElementById('editPersonality').value = user.personality || '';
+        toggleEditDogBreed();
+    }
+
+    function initEditMap(lat, lng) {
+        const mapContainer = document.getElementById('editMap');
+        const center = new kakao.maps.LatLng(lat || 37.5665, lng || 126.9780);
+        const mapOption = { center: center, level: 3 };
+        editMap = new kakao.maps.Map(mapContainer, mapOption);
+        editMarker = new kakao.maps.Marker({ position: center, map: editMap });
+        editGeocoder = new kakao.maps.services.Geocoder();
+
+        kakao.maps.event.addListener(editMap, 'click', function(mouseEvent) {
+            const latlng = mouseEvent.latLng;
+            editMarker.setPosition(latlng);
+            document.getElementById('editLatitude').value = latlng.getLat();
+            document.getElementById('editLongitude').value = latlng.getLng();
+            editGeocoder.coord2Address(latlng.getLng(), latlng.getLat(), function(result, status) {
+                if (status === kakao.maps.services.Status.OK) {
+                    const addr = result[0].address.address_name;
+                    document.getElementById('editAddress').value = addr;
+                    document.getElementById('editAddressSearch').value = addr;
+                }
+            });
+        });
+    }
+
+    // 주소 검색 (마이페이지)
+    document.getElementById('editAddressSearch').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            const keyword = this.value;
+            if (!keyword || !editGeocoder) return;
+            editGeocoder.addressSearch(keyword, function(result, status) {
+                if (status === kakao.maps.services.Status.OK) {
+                    const coords = new kakao.maps.LatLng(result[0].y, result[0].x);
+                    editMap.setCenter(coords);
+                    editMarker.setPosition(coords);
+                    document.getElementById('editLatitude').value = result[0].y;
+                    document.getElementById('editLongitude').value = result[0].x;
+                    document.getElementById('editAddress').value = result[0].address_name;
+                }
+            });
+        }
+    });
+
+    // 주인 정보 수정
+    document.getElementById('ownerForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const formData = new FormData();
+        formData.append('name', document.getElementById('editName').value);
+        formData.append('address', document.getElementById('editAddress').value);
+        const lat = document.getElementById('editLatitude').value;
+        const lng = document.getElementById('editLongitude').value;
+        if (lat) formData.append('latitude', lat);
+        if (lng) formData.append('longitude', lng);
+
+        const profileFile = document.getElementById('editProfileImage').files[0];
+        if (profileFile) formData.append('profileImage', profileFile);
+
+        const result = await fetch('/api/user/' + userKey + '/info', {
+            method: 'PUT',
+            body: formData
+        }).then(r => r.json());
+
+        if (result.success) {
+            alert('주인 정보가 수정되었습니다.');
+            loadUser();
+        } else {
+            alert(result.message || '수정에 실패했습니다.');
+        }
+    });
+
+    // 펫 정보 수정
+    document.getElementById('petForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const formData = new FormData();
+        formData.append('petType', document.getElementById('editPetType').value);
+        formData.append('petBreed', document.getElementById('editPetBreed').value);
+        formData.append('personality', document.getElementById('editPersonality').value);
+
+        const petFile = document.getElementById('editPetImage').files[0];
+        if (petFile) formData.append('petImage', petFile);
+
+        const result = await fetch('/api/user/' + userKey + '/pet', {
+            method: 'PUT',
+            body: formData
+        }).then(r => r.json());
+
+        if (result.success) {
+            alert('펫 정보가 수정되었습니다.');
+            loadUser();
+        } else {
+            alert(result.message || '수정에 실패했습니다.');
+        }
+    });
+
+    // 초기 로드
+    try { loadUser(); } catch(e) { console.error(e); }
+</script>
+</body>
+</html>

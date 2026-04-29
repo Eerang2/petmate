@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pet Mate - 커뮤니티</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .community-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 24px 20px;
+        }
+        .community-container .section-title {
+            text-align: center;
+            margin-bottom: 16px;
+        }
+
+        /* Tag filter grid */
+        .tag-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .tag-card {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 16px;
+            border-radius: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 2px solid transparent;
+            font-family: 'Pretendard', 'Apple SD Gothic Neo', sans-serif;
+        }
+        .tag-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.06); }
+        .tag-card.active { border-color: currentColor; box-shadow: 0 4px 14px rgba(0,0,0,0.08); }
+        .tag-card-emoji {
+            font-size: 28px;
+            flex-shrink: 0;
+            width: 42px;
+            height: 42px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            background: rgba(255,255,255,0.6);
+        }
+        .tag-card-text { min-width: 0; }
+        .tag-card-name {
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 2px;
+        }
+        .tag-card-desc {
+            font-size: 11px;
+            opacity: 0.7;
+            line-height: 1.3;
+        }
+
+        /* 전체 */
+        .tag-card[data-tag="전체"] { background: #f7f2ec; color: #8a7a66; }
+        .tag-card[data-tag="전체"].active { background: #f0e8dd; border-color: #B8956A; }
+
+        /* 우리 애 자랑 */
+        .tag-card[data-tag="우리 애 자랑"] { background: #FFF8F0; color: #D4883A; }
+        .tag-card[data-tag="우리 애 자랑"].active { background: #FFF1E0; border-color: #F0A050; }
+
+        /* 산책 후기 */
+        .tag-card[data-tag="산책 후기"] { background: #F2FAF3; color: #5A9660; }
+        .tag-card[data-tag="산책 후기"].active { background: #E4F5E6; border-color: #7BC47F; }
+
+        /* 질문게시판 */
+        .tag-card[data-tag="질문게시판"] { background: #F0F7FE; color: #5090C1; }
+        .tag-card[data-tag="질문게시판"].active { background: #E0EFFC; border-color: #74B9F0; }
+
+        /* 번개산책모집 */
+        .tag-card[data-tag="번개산책모집"] { background: #F8F0FA; color: #9C6DB5; }
+        .tag-card[data-tag="번개산책모집"].active { background: #F0E3F5; border-color: #C08AD8; }
+
+        /* 매칭 후기 */
+        .tag-card[data-tag="매칭 후기"] { background: #FEF0F4; color: #D8708A; }
+        .tag-card[data-tag="매칭 후기"].active { background: #FCE4EC; border-color: #F08AAA; }
+
+        /* Write button */
+        .write-btn-area {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 20px;
+        }
+        .btn-write {
+            padding: 10px 24px;
+            background: #B8956A;
+            color: #fff;
+            border: none;
+            border-radius: 20px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: 'Pretendard', 'Apple SD Gothic Neo', sans-serif;
+            transition: all 0.2s;
+        }
+        .btn-write:hover { background: #A6845C; }
+
+        /* Post cards grid */
+        .post-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 20px;
+        }
+        .post-card {
+            background: #fffdf9;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            border: 1px solid #f0e8dd;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .post-card:hover { transform: translateY(-4px); }
+        .post-card-img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            background: #f0e8dd;
+            display: block;
+        }
+        .post-card-noimg {
+            width: 100%;
+            height: 200px;
+            background: #f0e8dd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+        }
+        .post-card-body { padding: 16px; }
+        .post-card-tag {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        .post-card-tag[data-tag="우리 애 자랑"] { background: #FFF8F0; color: #D4883A; }
+        .post-card-tag[data-tag="산책 후기"] { background: #F2FAF3; color: #5A9660; }
+        .post-card-tag[data-tag="질문게시판"] { background: #F0F7FE; color: #5090C1; }
+        .post-card-tag[data-tag="번개산책모집"] { background: #F8F0FA; color: #9C6DB5; }
+        .post-card-tag[data-tag="매칭 후기"] { background: #FEF0F4; color: #D8708A; }
+        .post-card-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #5a4a3a;
+            margin-bottom: 8px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .post-card-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13px;
+            color: #999;
+        }
+        .post-card-author {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .post-card-author img {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            object-fit: cover;
+            background: #e0d5c8;
+        }
+        .post-card-stats {
+            display: flex;
+            gap: 12px;
+        }
+        .post-card-stats span { display: flex; align-items: center; gap: 3px; }
+
+        /* Search bar */
+        .search-bar {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+        .search-bar input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 2px solid #e8ddd0;
+            border-radius: 12px;
+            font-size: 14px;
+            font-family: 'Pretendard', 'Apple SD Gothic Neo', sans-serif;
+            background: #fffdf9;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .search-bar input:focus { border-color: #B8956A; }
+        .search-btn {
+            padding: 0 20px;
+            background: #B8956A;
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: 'Pretendard', 'Apple SD Gothic Neo', sans-serif;
+            transition: background 0.2s;
+            white-space: nowrap;
+        }
+        .search-btn:hover { background: #A6845C; }
+
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+            color: #999;
+        }
+        .empty-state .icon { font-size: 64px; margin-bottom: 16px; }
+
+        @media (max-width: 768px) {
+            .tag-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+            .tag-card { padding: 10px 12px; gap: 10px; }
+            .tag-card-emoji { font-size: 22px; width: 34px; height: 34px; border-radius: 10px; }
+            .tag-card-name { font-size: 13px; }
+            .tag-card-desc { font-size: 10px; }
+            .post-grid { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Header -->
+<header class="header">
+    <div class="header-inner">
+        <a href="/main.html" class="logo">
+            <span>🐾</span> Pet Mate
+        </a>
+        <nav class="nav">
+            <a href="/community.html" style="color:#B8956A;">커뮤니티</a>
+            <a href="/matching.html">매칭 잡기</a>
+            <a href="/chat.html">채팅</a>
+            <a href="/mypage.html">마이페이지</a>
+            <a href="#" onclick="logout()" style="color:#e53935;">로그아웃</a>
+        </nav>
+    </div>
+</header>
+
+<div class="community-container">
+    <h2 class="section-title">커뮤니티</h2>
+
+    <!-- Tag filter cards -->
+    <div class="tag-grid" id="tagGrid">
+        <div class="tag-card active" data-tag="전체">
+            <div class="tag-card-emoji">🐾</div>
+            <div class="tag-card-text">
+                <div class="tag-card-name">전체</div>
+                <div class="tag-card-desc">모든 게시글 모아보기</div>
+            </div>
+        </div>
+        <div class="tag-card" data-tag="우리 애 자랑">
+            <div class="tag-card-emoji">🏆</div>
+            <div class="tag-card-text">
+                <div class="tag-card-name">우리 애 자랑</div>
+                <div class="tag-card-desc">우리 아이의 귀엽고 사랑스러운 모습 자랑하기</div>
+            </div>
+        </div>
+        <div class="tag-card" data-tag="산책 후기">
+            <div class="tag-card-emoji">🌿</div>
+            <div class="tag-card-text">
+                <div class="tag-card-name">산책 후기</div>
+                <div class="tag-card-desc">오늘의 산책 코스와 후기를 공유해요</div>
+            </div>
+        </div>
+        <div class="tag-card" data-tag="질문게시판">
+            <div class="tag-card-emoji">❓</div>
+            <div class="tag-card-text">
+                <div class="tag-card-name">질문게시판</div>
+                <div class="tag-card-desc">반려동물에 대해 궁금한 점을 질문해요</div>
+            </div>
+        </div>
+        <div class="tag-card" data-tag="번개산책모집">
+            <div class="tag-card-emoji">⚡</div>
+            <div class="tag-card-text">
+                <div class="tag-card-name">번개산책모집</div>
+                <div class="tag-card-desc">지금 바로 함께 산책할 친구 모집!</div>
+            </div>
+        </div>
+        <div class="tag-card" data-tag="매칭 후기">
+            <div class="tag-card-emoji">💕</div>
+            <div class="tag-card-text">
+                <div class="tag-card-name">매칭 후기</div>
+                <div class="tag-card-desc">매칭 후 만남은 어땠는지 후기를 남겨요</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search bar -->
+    <div class="search-bar">
+        <input type="text" id="searchInput" placeholder="게시글 검색..." onkeypress="if(event.key==='Enter') doSearch()">
+        <button class="search-btn" onclick="doSearch()">검색</button>
+    </div>
+
+    <!-- Write button -->
+    <div class="write-btn-area">
+        <button class="btn-write" onclick="location.href='/community-write.html'">글쓰기</button>
+    </div>
+
+    <!-- Post grid -->
+    <div class="post-grid" id="postGrid"></div>
+</div>
+
+<!-- Footer -->
+<footer class="footer">
+    <p>&copy; 2026 Pet Mate. All rights reserved.</p>
+</footer>
+
+<script src="/js/common.js"></script>
+<script>
+    if (!isLoggedIn()) location.href = '/index.html';
+
+    const userKey = getUserKey();
+    let currentTag = '전체';
+    let currentKeyword = '';
+
+    document.querySelectorAll('.tag-card').forEach(card => {
+        card.addEventListener('click', () => {
+            document.querySelector('.tag-card.active').classList.remove('active');
+            card.classList.add('active');
+            currentTag = card.dataset.tag;
+            loadPosts();
+        });
+    });
+
+    function doSearch() {
+        const keyword = document.getElementById('searchInput').value.trim();
+        currentKeyword = keyword;
+
+        // 태그 초기화 → 전체로
+        document.querySelector('.tag-card.active').classList.remove('active');
+        document.querySelector('.tag-card[data-tag="전체"]').classList.add('active');
+        currentTag = '전체';
+
+        loadPosts();
+    }
+
+    async function loadPosts() {
+        const params = new URLSearchParams();
+        if (currentTag && currentTag !== '전체') params.append('tag', currentTag);
+        if (currentKeyword) params.append('keyword', currentKeyword);
+        if (userKey) params.append('userKey', userKey);
+
+        try {
+            const posts = await apiCall('/api/community/posts?' + params.toString());
+            renderPosts(posts);
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
+    function renderPosts(posts) {
+        const grid = document.getElementById('postGrid');
+        if (!posts || posts.length === 0) {
+            grid.innerHTML = `
+                <div class="empty-state" style="grid-column: 1/-1;">
+                    <div class="icon">📝</div>
+                    <p>아직 게시글이 없습니다. 첫 글을 작성해보세요!</p>
+                </div>`;
+            return;
+        }
+
+        grid.innerHTML = posts.map(post => `
+            <div class="post-card" onclick="location.href='/community-detail.html?id=${post.id}'">
+                ${post.thumbnailImage
+                    ? `<img class="post-card-img" src="${post.thumbnailImage}" alt="">`
+                    : `<div class="post-card-noimg">📷</div>`}
+                <div class="post-card-body">
+                    <span class="post-card-tag" data-tag="${post.tag}">${getTagEmoji(post.tag)} ${post.tag}</span>
+                    <div class="post-card-title">${escapeHtml(post.title)}</div>
+                    <div class="post-card-meta">
+                        <div class="post-card-author">
+                            <img src="${post.userProfileImage || '/uploads/default_profile.png'}" alt="">
+                            <span>${escapeHtml(post.userName)}</span>
+                        </div>
+                        <div class="post-card-stats">
+                            <span>♥ ${post.likeCount}</span>
+                            <span>💬 ${post.commentCount}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>`).join('');
+    }
+
+    function getTagEmoji(tag) {
+        const map = { '우리 애 자랑': '🏆', '산책 후기': '🌿', '질문게시판': '❓', '번개산책모집': '⚡', '매칭 후기': '💕' };
+        return map[tag] || '🐾';
+    }
+
+    function escapeHtml(text) {
+        if (!text) return '';
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    loadPosts();
+</script>
+</body>
+</html>
