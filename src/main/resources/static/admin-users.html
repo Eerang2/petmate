@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pet Mate - 회원 관리</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .admin-layout { display: flex; min-height: calc(100vh - 64px - 60px); }
+        .admin-sidebar { width: 220px; background: #fffdf9; border-right: 1px solid #f0e8dd; padding: 24px 0; flex-shrink: 0; }
+        .admin-sidebar a { display: block; padding: 14px 24px; font-size: 15px; font-weight: 600; color: #7a6a56; text-decoration: none; transition: all 0.2s; }
+        .admin-sidebar a:hover { background: #f7f2ec; color: #B8956A; }
+        .admin-sidebar a.active { background: #f7f2ec; color: #B8956A; border-left: 3px solid #B8956A; }
+        .admin-content { flex: 1; padding: 32px; max-width: 1100px; }
+        .admin-content h2 { font-size: 22px; color: #5a4a3a; margin-bottom: 24px; }
+        .filter-bar { display: flex; gap: 12px; margin-bottom: 24px; align-items: center; }
+        .filter-bar input { flex: 1; max-width: 300px; padding: 10px 16px; border: 2px solid #f0e8dd; border-radius: 10px; font-size: 14px; }
+        .filter-bar input:focus { outline: none; border-color: #B8956A; }
+        .filter-bar button { padding: 10px 20px; background: #B8956A; color: #fff; border: none; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; }
+        .data-table { width: 100%; border-collapse: collapse; background: #fffdf9; border-radius: 16px; overflow: hidden; border: 1px solid #f0e8dd; }
+        .data-table th { background: #f7f2ec; padding: 14px 16px; font-size: 13px; font-weight: 700; color: #7a6a56; text-align: left; }
+        .data-table td { padding: 14px 16px; font-size: 14px; color: #5a4a3a; border-top: 1px solid #f0e8dd; }
+        .data-table tr:hover { background: #faf6f1; }
+        .badge { display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 700; }
+        .badge-silver { background: #f0f0f0; color: #888; }
+        .badge-gold { background: #fff3cd; color: #856404; }
+        .badge-diamond { background: #e8d5f5; color: #6f42c1; }
+        .btn-delete { padding: 6px 14px; background: #e53935; color: #fff; border: none; border-radius: 8px; font-size: 13px; cursor: pointer; }
+        .btn-delete:hover { background: #c62828; }
+        .empty-state { text-align: center; padding: 60px 20px; color: #999; }
+        .user-count { font-size: 14px; color: #999; margin-bottom: 16px; }
+    </style>
+</head>
+<body>
+
+<header class="header">
+    <div class="header-inner">
+        <a href="/admin-dashboard.html" class="logo"><span>🐾</span> Pet Mate Admin</a>
+        <nav class="nav">
+            <span id="adminName" style="color:#999;font-size:14px;margin-right:12px;"></span>
+            <button onclick="adminLogout()" style="padding:6px 16px;background:#e53935;color:#fff;border:none;border-radius:8px;font-size:13px;cursor:pointer;">로그아웃</button>
+        </nav>
+    </div>
+</header>
+
+<div class="admin-layout">
+    <nav class="admin-sidebar">
+        <a href="/admin-dashboard.html">대시보드</a>
+        <a href="/admin-users.html" class="active">회원 관리</a>
+        <a href="/admin-posts.html">게시판 관리</a>
+        <a href="/admin.html">결제 관리</a>
+        <a href="/admin-reports.html">신고 관리</a>
+    </nav>
+
+    <div class="admin-content">
+        <h2>회원 관리</h2>
+
+        <div class="filter-bar">
+            <input type="text" id="searchInput" placeholder="회원 이름으로 검색..." onkeydown="if(event.key==='Enter')loadUsers()">
+            <button onclick="loadUsers()">검색</button>
+        </div>
+
+        <div class="user-count" id="userCount"></div>
+
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>이름</th>
+                    <th>아이디</th>
+                    <th>나이</th>
+                    <th>주소</th>
+                    <th>등급</th>
+                    <th>반려동물</th>
+                    <th>가입일</th>
+                    <th>관리</th>
+                </tr>
+            </thead>
+            <tbody id="userTableBody">
+            </tbody>
+        </table>
+        <div class="empty-state" id="emptyState" style="display:none;">회원이 없습니다.</div>
+    </div>
+</div>
+
+<footer class="footer"><p>&copy; 2026 Pet Mate Admin</p></footer>
+
+<script>
+async function checkAdmin() {
+    try {
+        const res = await fetch('/api/admin/check');
+        const data = await res.json();
+        if (!data.loggedIn) { location.href = '/admin-login.html'; return false; }
+        document.getElementById('adminName').textContent = data.adminName + ' 관리자';
+        return true;
+    } catch(e) { location.href = '/admin-login.html'; return false; }
+}
+
+async function adminLogout() {
+    await fetch('/api/admin/logout', { method: 'POST' });
+    location.href = '/admin-login.html';
+}
+
+function escapeHtml(text) {
+    if (!text) return '-';
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+function gradeBadge(grade) {
+    const cls = grade === 'GOLD' ? 'badge-gold' : grade === 'DIAMOND' ? 'badge-diamond' : 'badge-silver';
+    return '<span class="badge ' + cls + '">' + grade + '</span>';
+}
+
+async function loadUsers() {
+    const keyword = document.getElementById('searchInput').value.trim();
+    const params = keyword ? '?keyword=' + encodeURIComponent(keyword) : '';
+    const res = await fetch('/api/admin/users' + params);
+    const users = await res.json();
+
+    const tbody = document.getElementById('userTableBody');
+    const empty = document.getElementById('emptyState');
+    document.getElementById('userCount').textContent = '총 ' + users.length + '명';
+
+    if (users.length === 0) {
+        tbody.innerHTML = '';
+        empty.style.display = 'block';
+        return;
+    }
+    empty.style.display = 'none';
+
+    tbody.innerHTML = users.map(u => `
+        <tr>
+            <td>${u.id}</td>
+            <td>${escapeHtml(u.name)}</td>
+            <td>${escapeHtml(u.loginId)}</td>
+            <td>${u.age || '-'}</td>
+            <td>${escapeHtml(u.address)}</td>
+            <td>${gradeBadge(u.grade)}</td>
+            <td>${escapeHtml(u.petType || '-')}</td>
+            <td>${escapeHtml(u.createdAt)}</td>
+            <td><button class="btn-delete" onclick="deleteUser(${u.id})">삭제</button></td>
+        </tr>
+    `).join('');
+}
+
+async function deleteUser(userId) {
+    if (!confirm('정말 이 회원을 삭제하시겠습니까?\n관련된 모든 데이터가 삭제됩니다.')) return;
+    const res = await fetch('/api/admin/users/' + userId, { method: 'DELETE' });
+    const result = await res.json();
+    if (result.success) {
+        alert('회원이 삭제되었습니다.');
+        loadUsers();
+    } else {
+        alert(result.message || '삭제에 실패했습니다.');
+    }
+}
+
+(async () => {
+    if (await checkAdmin()) loadUsers();
+})();
+</script>
+</body>
+</html>

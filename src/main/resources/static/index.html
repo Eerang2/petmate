@@ -88,13 +88,25 @@
 <footer class="footer">
     <p>&copy; 2026 Pet Mate. All rights reserved.</p>
 </footer>
+<div id="adminTrigger" style="position:fixed;bottom:0;right:0;width:60px;height:60px;cursor:default;z-index:999;"></div>
 
 <script src="/js/common.js"></script>
 <script>
-    // 이미 로그인 상태면 메인으로
     if (isLoggedIn()) {
         location.href = '/main.html';
     }
+
+    let adminClickCount = 0;
+    let adminClickTimer = null;
+    document.getElementById('adminTrigger').addEventListener('click', function() {
+        adminClickCount++;
+        clearTimeout(adminClickTimer);
+        adminClickTimer = setTimeout(() => { adminClickCount = 0; }, 3000);
+        if (adminClickCount >= 5) {
+            adminClickCount = 0;
+            location.href = '/admin-login.html';
+        }
+    });
 </script>
 </body>
 </html>

@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pet Mate - 관리자 로그인</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .admin-login-container {
+            max-width: 400px;
+            margin: 120px auto;
+            padding: 40px;
+            background: #fffdf9;
+            border-radius: 20px;
+            border: 1px solid #f0e8dd;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+            text-align: center;
+        }
+        .admin-login-container h2 {
+            font-size: 24px;
+            color: #5a4a3a;
+            margin-bottom: 8px;
+        }
+        .admin-login-container p.sub {
+            color: #999;
+            font-size: 14px;
+            margin-bottom: 32px;
+        }
+        .form-group {
+            margin-bottom: 16px;
+            text-align: left;
+        }
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #5a4a3a;
+            margin-bottom: 6px;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 12px 14px;
+            border: 2px solid #f0e8dd;
+            border-radius: 10px;
+            font-size: 15px;
+            background: #fff;
+            transition: border-color 0.2s;
+            box-sizing: border-box;
+        }
+        .form-group input:focus {
+            outline: none;
+            border-color: #B8956A;
+        }
+        .btn-admin-login {
+            width: 100%;
+            padding: 14px;
+            background: #5a4a3a;
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 8px;
+            transition: background 0.2s;
+        }
+        .btn-admin-login:hover {
+            background: #4a3a2a;
+        }
+        .error-msg {
+            color: #e53935;
+            font-size: 14px;
+            margin-top: 12px;
+            display: none;
+        }
+        .back-link {
+            display: inline-block;
+            margin-top: 20px;
+            color: #999;
+            font-size: 14px;
+            text-decoration: none;
+        }
+        .back-link:hover {
+            color: #B8956A;
+        }
+    </style>
+</head>
+<body>
+<div class="admin-login-container">
+    <h2>관리자 로그인</h2>
+    <p class="sub">관리자 계정으로 로그인해주세요</p>
+    <form id="adminLoginForm">
+        <div class="form-group">
+            <label>아이디</label>
+            <input type="text" id="loginId" required placeholder="관리자 아이디">
+        </div>
+        <div class="form-group">
+            <label>비밀번호</label>
+            <input type="password" id="password" required placeholder="비밀번호">
+        </div>
+        <button type="submit" class="btn-admin-login">로그인</button>
+        <p class="error-msg" id="errorMsg"></p>
+    </form>
+    <a href="/index.html" class="back-link">메인으로 돌아가기</a>
+</div>
+
+<script>
+document.getElementById('adminLoginForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const loginId = document.getElementById('loginId').value;
+    const password = document.getElementById('password').value;
+    const errorMsg = document.getElementById('errorMsg');
+
+    try {
+        const res = await fetch('/api/admin/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ loginId, password })
+        });
+        const result = await res.json();
+
+        if (result.success) {
+            location.href = '/admin-dashboard.html';
+        } else {
+            errorMsg.textContent = result.message || '로그인에 실패했습니다.';
+            errorMsg.style.display = 'block';
+        }
+    } catch (e) {
+        errorMsg.textContent = '서버 연결에 실패했습니다.';
+        errorMsg.style.display = 'block';
+    }
+});
+</script>
+</body>
+</html>

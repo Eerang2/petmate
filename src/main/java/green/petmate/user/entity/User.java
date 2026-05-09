@@ -3,6 +3,8 @@ package green.petmate.user.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "users")
 @Getter @Setter
@@ -38,6 +40,9 @@ public class User {
     @Column(nullable = false)
     @Builder.Default
     private Grade grade = Grade.SILVER;
+
+    @Builder.Default
+    private LocalDateTime createdAt = LocalDateTime.now();
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Pet pet;

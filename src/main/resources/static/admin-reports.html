@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pet Mate - 신고 관리</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .admin-layout { display: flex; min-height: calc(100vh - 64px - 60px); }
+        .admin-sidebar { width: 220px; background: #fffdf9; border-right: 1px solid #f0e8dd; padding: 24px 0; flex-shrink: 0; }
+        .admin-sidebar a { display: block; padding: 14px 24px; font-size: 15px; font-weight: 600; color: #7a6a56; text-decoration: none; transition: all 0.2s; }
+        .admin-sidebar a:hover { background: #f7f2ec; color: #B8956A; }
+        .admin-sidebar a.active { background: #f7f2ec; color: #B8956A; border-left: 3px solid #B8956A; }
+        .admin-content { flex: 1; padding: 32px; display: flex; align-items: center; justify-content: center; }
+        .placeholder { text-align: center; padding: 60px 20px; }
+        .placeholder .icon { font-size: 64px; margin-bottom: 20px; }
+        .placeholder h2 { color: #5a4a3a; margin-bottom: 12px; font-size: 22px; }
+        .placeholder p { color: #999; font-size: 16px; }
+        .placeholder .coming { color: #bbb; font-size: 14px; margin-top: 8px; }
+    </style>
+</head>
+<body>
+
+<header class="header">
+    <div class="header-inner">
+        <a href="/admin-dashboard.html" class="logo"><span>🐾</span> Pet Mate Admin</a>
+        <nav class="nav">
+            <span id="adminName" style="color:#999;font-size:14px;margin-right:12px;"></span>
+            <button onclick="adminLogout()" style="padding:6px 16px;background:#e53935;color:#fff;border:none;border-radius:8px;font-size:13px;cursor:pointer;">로그아웃</button>
+        </nav>
+    </div>
+</header>
+
+<div class="admin-layout">
+    <nav class="admin-sidebar">
+        <a href="/admin-dashboard.html">대시보드</a>
+        <a href="/admin-users.html">회원 관리</a>
+        <a href="/admin-posts.html">게시판 관리</a>
+        <a href="/admin.html">결제 관리</a>
+        <a href="/admin-reports.html" class="active">신고 관리</a>
+    </nav>
+
+    <div class="admin-content">
+        <div class="placeholder">
+            <div class="icon">📋</div>
+            <h2>신고 관리</h2>
+            <p>신고 관리 기능은 준비 중입니다.</p>
+            <p class="coming">Coming Soon</p>
+        </div>
+    </div>
+</div>
+
+<footer class="footer"><p>&copy; 2026 Pet Mate Admin</p></footer>
+
+<script>
+async function checkAdmin() {
+    try {
+        const res = await fetch('/api/admin/check');
+        const data = await res.json();
+        if (!data.loggedIn) { location.href = '/admin-login.html'; return; }
+        document.getElementById('adminName').textContent = data.adminName + ' 관리자';
+    } catch(e) { location.href = '/admin-login.html'; }
+}
+
+async function adminLogout() {
+    await fetch('/api/admin/logout', { method: 'POST' });
+    location.href = '/admin-login.html';
+}
+
+checkAdmin();
+</script>
+</body>
+</html>
