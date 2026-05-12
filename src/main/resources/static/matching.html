@@ -235,6 +235,26 @@
             font-size: 14px;
             color: #888;
         }
+
+        @media (max-width: 768px) {
+            .matching-container { margin: 20px auto; padding: 0 12px; }
+            .region-select-box select { min-width: 140px; font-size: 14px; padding: 10px 16px; }
+            .region-select-box button { padding: 10px 20px; font-size: 14px; margin-left: 6px; }
+            .match-card { width: 100%; max-width: 100%; }
+            .match-card-wrapper { gap: 6px; min-height: 360px; }
+            .card-slide { padding: 20px 16px; min-height: 340px; }
+            .owner-slide .profile-photo, .pet-slide .pet-photo { width: 90px; height: 90px; margin-bottom: 14px; }
+            .next-person-arrow, .prev-person-arrow { width: 36px; height: 36px; font-size: 18px; }
+            .slide-arrow { width: 30px; height: 30px; font-size: 16px; }
+            .btn-match { padding: 12px 32px; font-size: 14px; }
+            .info-label { width: 60px; font-size: 13px; }
+            .info-value { font-size: 13px; }
+        }
+        @media (max-width: 400px) {
+            .region-select-box { display: flex; flex-direction: column; gap: 10px; align-items: center; }
+            .region-select-box button { margin-left: 0; width: 100%; max-width: 200px; }
+            .region-select-box select { width: 100%; max-width: 200px; }
+        }
     </style>
 </head>
 <body>

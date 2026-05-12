@@ -18,4 +18,7 @@ public interface MatchRequestRepository extends JpaRepository<MatchRequest, Long
 
     @Query("SELECT COUNT(m) FROM MatchRequest m WHERE m.createdAt >= :start AND m.createdAt < :end")
     long countByCreatedAtBetween(@Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
+
+    @Query("SELECT m FROM MatchRequest m WHERE (m.sender.id = :u1 AND m.receiver.id = :u2) OR (m.sender.id = :u2 AND m.receiver.id = :u1)")
+    Optional<MatchRequest> findBetweenUsers(@Param("u1") Long u1, @Param("u2") Long u2);
 }

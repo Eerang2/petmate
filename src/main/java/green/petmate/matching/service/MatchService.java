@@ -105,6 +105,13 @@ public class MatchService {
         }).collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
+    public String getMatchStatus(Long userId, Long targetId) {
+        Optional<MatchRequest> req = matchRequestRepository.findBetweenUsers(userId, targetId);
+        if (req.isEmpty()) return "NONE";
+        return req.get().getStatus();
+    }
+
     private double calculateDistance(Double lat1, Double lon1, Double lat2, Double lon2) {
         if (lat1 == null || lon1 == null || lat2 == null || lon2 == null) return Double.MAX_VALUE;
         double R = 6371; // km

@@ -27,6 +27,24 @@
         .admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
         .admin-header .admin-info { font-size: 14px; color: #999; }
         .admin-header .btn-logout { padding: 6px 16px; background: #e53935; color: #fff; border: none; border-radius: 8px; font-size: 13px; cursor: pointer; }
+        .admin-sidebar-toggle { display: none; background: #B8956A; color: #fff; border: none; padding: 8px 14px; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; margin: 12px 16px; }
+        @media (max-width: 768px) {
+            .admin-layout { flex-direction: column; }
+            .admin-sidebar { width: 100%; border-right: none; border-bottom: 1px solid #f0e8dd; padding: 0; display: none; }
+            .admin-sidebar.open { display: block; }
+            .admin-sidebar a { display: inline-block; padding: 12px 16px; font-size: 13px; border-left: none !important; }
+            .admin-sidebar-toggle { display: block; }
+            .admin-content { padding: 16px; }
+            .admin-content h2 { font-size: 18px; margin-bottom: 16px; }
+            .stat-cards { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+            .stat-card .value { font-size: 22px; }
+            .chart-container { padding: 16px; }
+            .period-toggle { flex-wrap: wrap; }
+            .period-btn { padding: 6px 14px; font-size: 13px; }
+        }
+        @media (max-width: 480px) {
+            .stat-cards { grid-template-columns: 1fr; }
+        }
     </style>
 </head>
 <body>
@@ -42,6 +60,7 @@
 </header>
 
 <div class="admin-layout">
+    <button class="admin-sidebar-toggle" onclick="document.querySelector('.admin-sidebar').classList.toggle('open')">☰ 메뉴</button>
     <nav class="admin-sidebar">
         <a href="/admin-dashboard.html" class="active">대시보드</a>
         <a href="/admin-users.html">회원 관리</a>

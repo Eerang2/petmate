@@ -225,12 +225,21 @@
         .empty-state .icon { font-size: 64px; margin-bottom: 16px; }
 
         @media (max-width: 768px) {
+            .community-container { padding: 16px 12px; }
             .tag-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
             .tag-card { padding: 10px 12px; gap: 10px; }
             .tag-card-emoji { font-size: 22px; width: 34px; height: 34px; border-radius: 10px; }
             .tag-card-name { font-size: 13px; }
             .tag-card-desc { font-size: 10px; }
-            .post-grid { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; }
+            .post-grid { grid-template-columns: 1fr; gap: 14px; }
+            .post-card-img, .post-card-noimg { height: 160px; }
+            .search-bar input { font-size: 13px; padding: 10px 12px; }
+            .search-btn { padding: 0 14px; font-size: 13px; }
+        }
+        @media (max-width: 400px) {
+            .tag-grid { grid-template-columns: repeat(2, 1fr); gap: 6px; }
+            .tag-card-desc { display: none; }
+            .tag-card { padding: 10px; }
         }
     </style>
 </head>

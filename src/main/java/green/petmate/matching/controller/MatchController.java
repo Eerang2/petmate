@@ -67,4 +67,10 @@ public class MatchController {
     public ResponseEntity<?> getAcceptedUsers(@RequestParam Long userKey) {
         return ResponseEntity.ok(matchService.getAcceptedUsers(userKey));
     }
+
+    @GetMapping("/status")
+    public ResponseEntity<?> getMatchStatus(@RequestParam Long userKey, @RequestParam Long targetId) {
+        String status = matchService.getMatchStatus(userKey, targetId);
+        return ResponseEntity.ok(Map.of("status", status));
+    }
 }

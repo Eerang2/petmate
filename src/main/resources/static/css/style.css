@@ -290,11 +290,67 @@ a { text-decoration: none; color: inherit; }
 .grade-badge-silver { background: #F5F5F5; color: #888; }
 .grade-badge-gold { background: #FFF8E7; color: #D4A843; }
 
+/* ===== Mobile Nav Toggle ===== */
+.nav-toggle {
+    display: none;
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: #7a6a56;
+    cursor: pointer;
+    padding: 4px 8px;
+}
+
 /* ===== Responsive ===== */
 @media (max-width: 768px) {
-    .hero h1 { font-size: 28px; }
-    .hero p { font-size: 15px; }
+    .hero { padding: 50px 16px; }
+    .hero h1 { font-size: 26px; }
+    .hero p { font-size: 14px; margin-bottom: 24px; }
+    .hero .btn-cta { padding: 12px 28px; font-size: 14px; }
+
     .header-inner { padding: 0 12px; }
-    .nav { gap: 12px; }
-    .nav a { font-size: 13px; }
+
+    .nav-toggle { display: block; }
+    .nav {
+        display: none;
+        position: absolute;
+        top: 64px;
+        left: 0;
+        right: 0;
+        background: #fffdf9;
+        flex-direction: column;
+        padding: 16px 20px;
+        gap: 0;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        z-index: 99;
+    }
+    .nav.open { display: flex; }
+    .nav a {
+        font-size: 15px;
+        padding: 12px 0;
+        border-bottom: 1px solid #f0e8dd;
+    }
+    .nav a:last-child { border-bottom: none; }
+    .nav .btn-login { text-align: center; margin-top: 8px; }
+
+    .section { padding: 40px 16px; }
+    .section-title { font-size: 22px; margin-bottom: 24px; }
+    .cards { grid-template-columns: 1fr; gap: 16px; }
+    .card { padding: 24px 20px; }
+
+    .auth-container { margin: 30px auto; padding: 0 16px; }
+    .auth-box { padding: 28px 20px; }
+
+    .mypage-container { margin: 24px auto; padding: 0 16px; }
+
+    .footer { margin-top: 40px; padding: 24px 16px; }
+}
+
+@media (max-width: 480px) {
+    .hero h1 { font-size: 22px; }
+    .hero p { font-size: 13px; }
+    .logo { font-size: 20px; }
+    .logo span { font-size: 22px; }
+    .section-title { font-size: 20px; }
+    .auth-box h2 { font-size: 20px; }
 }

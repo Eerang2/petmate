@@ -263,10 +263,14 @@
         .reply-form button:hover { background: #C4A882; }
 
         @media (max-width: 768px) {
-            .image-gallery img { height: 280px; }
-            .post-title { font-size: 20px; }
-            .reply-list { padding-left: 20px; }
-            .reply-form { padding-left: 20px; }
+            .detail-container { padding: 16px 12px 40px; }
+            .image-gallery img { height: 220px; }
+            .post-title { font-size: 18px; }
+            .post-content { font-size: 14px; }
+            .reply-list { padding-left: 16px; }
+            .reply-form { padding-left: 16px; }
+            .comment-form { flex-direction: column; }
+            .comment-form button { align-self: flex-end; }
         }
     </style>
 </head>
@@ -379,8 +383,10 @@
             '<span class="post-tag" data-tag="' + p.tag + '">' + getTagEmoji(p.tag) + ' ' + escapeHtml(p.tag) + '</span>' +
             '<h1 class="post-title">' + escapeHtml(p.title) + '</h1>' +
             '<div class="post-author-row">' +
-                '<img src="' + (p.userProfileImage || '/uploads/default_profile.png') + '">' +
-                '<span class="author-name">' + escapeHtml(p.userName) + '</span>' +
+                '<a href="/userprofile.html?id=' + p.userId + '" style="display:flex;align-items:center;gap:6px;text-decoration:none;color:inherit;">' +
+                    '<img src="' + (p.userProfileImage || '/uploads/default_profile.png') + '" style="cursor:pointer;">' +
+                    '<span class="author-name" style="cursor:pointer;">' + escapeHtml(p.userName) + '</span>' +
+                '</a>' +
                 '<span>' + formatDate(p.createdAt) + '</span>' +
                 (String(p.userId) === String(userKey) ?
                     '<button class="btn-delete-post" onclick="deletePost()">삭제</button>' : '') +

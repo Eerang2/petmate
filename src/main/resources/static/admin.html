@@ -48,11 +48,24 @@
         .btn-refund:disabled:hover { background: #fff; color: #ccc; }
 
         .empty-row { text-align: center; color: #999; padding: 60px 20px !important; }
+        .admin-sidebar-toggle { display: none; background: #B8956A; color: #fff; border: none; padding: 8px 14px; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; margin: 12px 16px; }
 
         @media (max-width: 768px) {
+            .admin-layout { flex-direction: column; }
+            .admin-sidebar { width: 100%; border-right: none; border-bottom: 1px solid #f0e8dd; padding: 0; display: none; }
+            .admin-sidebar.open { display: block; }
+            .admin-sidebar a { display: inline-block; padding: 12px 16px; font-size: 13px; border-left: none !important; }
+            .admin-sidebar-toggle { display: block; }
+            .admin-content { padding: 16px; }
+            .admin-content h2 { font-size: 18px; }
             .stat-grid { grid-template-columns: repeat(2, 1fr); }
             .filter-bar { flex-direction: column; }
             .filter-bar input { min-width: unset; }
+            table { font-size: 12px; }
+            thead th, tbody td { padding: 10px 8px; }
+        }
+        @media (max-width: 480px) {
+            .stat-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -69,6 +82,7 @@
 </header>
 
 <div class="admin-layout">
+    <button class="admin-sidebar-toggle" onclick="document.querySelector('.admin-sidebar').classList.toggle('open')">☰ 메뉴</button>
     <nav class="admin-sidebar">
         <a href="/admin-dashboard.html">대시보드</a>
         <a href="/admin-users.html">회원 관리</a>
